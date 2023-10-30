@@ -5,8 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Home from './screens/Home';
-import { RootStackParamList } from './types';
-import ClaimLocker from './screens/ClaimLocker';
+import { RootStackParamList } from './navigation/types';
+import ClaimLocker from './screens/Claim/ClaimLocker';
 
 export default function App(): JSX.Element {
   const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -18,7 +18,7 @@ export default function App(): JSX.Element {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ClaimLocker" component={ClaimLocker} />
+        <Stack.Screen name="ClaimLocker" component={ClaimLocker} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -4,9 +4,9 @@ import {
   Button,
   Text,
 } from 'react-native-paper';
-import { MainScreenProps } from '@/types';
+import { RootStackScreenProps } from '@/navigation/types';
 
-export default function Main(props: MainScreenProps): JSX.Element {
+export default function Main(props: RootStackScreenProps<'Main'>): JSX.Element {
   return (
       <View style={{
         width: '100%',

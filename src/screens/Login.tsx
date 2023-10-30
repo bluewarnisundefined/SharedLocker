@@ -1,4 +1,4 @@
-import { LoginScreenProps } from '@/types';
+import { RootStackScreenProps } from '@/navigation/types';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
@@ -8,7 +8,7 @@ import {
     TextInput,
 } from 'react-native-paper';
 
-export default function Login(props: LoginScreenProps): JSX.Element {
+export default function Login(props: RootStackScreenProps<'Login'>): JSX.Element {
     const [checked, setChecked] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');

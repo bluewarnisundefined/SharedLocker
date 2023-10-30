@@ -1,4 +1,4 @@
-import { HomeScreenNavigationProp, HomeScreenProps } from '@/types';
+import { RootStackScreenProps } from '@/navigation/types';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import {
@@ -10,7 +10,7 @@ import {
 } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 
-export default function Home(props: HomeScreenProps): JSX.Element {
+export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     return (
         <ScrollView style={{
             padding: 16,
