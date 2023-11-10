@@ -5,6 +5,7 @@ import {
   Text,
 } from 'react-native-paper';
 import { RootStackScreenProps } from '@/navigation/types';
+import { removeAllSecureToken } from '@/utils/keychain';
 
 export default function Main(props: RootStackScreenProps<'Main'>): JSX.Element {
   return (
@@ -37,6 +38,15 @@ export default function Main(props: RootStackScreenProps<'Main'>): JSX.Element {
           }}>
             회원가입
           </Button>
+
+          <Button mode='elevated' onPress={() => {
+            removeAllSecureToken().then(res => {
+              console.log('토큰이 모두 제거되었습니다.');
+            })
+          }}>
+            removeAllSecureToken
+          </Button>
+          
         </View>
       </View>
   );
