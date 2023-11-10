@@ -1,4 +1,6 @@
 import { RootStackScreenProps } from '@/navigation/types';
+import authAPI from '@/network/auth/api';
+import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
@@ -12,10 +14,12 @@ export default function Login(props: RootStackScreenProps<'Login'>): JSX.Element
     const [checked, setChecked] = useState(false);
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
+        
+    const { refetch } = useQuery(['auth'], () => authAPI().signIn(id, password), {
+        enabled: false,
+        retry: false
+    });
 
-    const onLoginBtnPressed = () => {
-        props.navigation.navigate('Home');
-    }
     return (
         <ScrollView style={{
             padding: 16,
@@ -35,21 +39,21 @@ export default function Login(props: RootStackScreenProps<'Login'>): JSX.Element
                     style={{
                         gap: 14,
                     }}>
-                    <TextInput 
-                        placeholder='아이디' 
-                        value={id}
+                    <TextInput
+                        placeholder='아이디'
+                        onChangeText={(newText) => { setId(newText) }}
                     />
-                    <TextInput 
-                        placeholder='비밀번호' 
-                        value={password}
+                    <TextInput
+                        placeholder='비밀번호'
+                        onChangeText={(newText) => { setPassword(newText) }}
                     />
                 </View>
                 <View style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    
+
                 }}>
-                    <Checkbox 
+                    <Checkbox
                         status={checked ? 'checked' : 'unchecked'}
                         onPress={() => {
                             setChecked(!checked);
@@ -59,9 +63,9 @@ export default function Login(props: RootStackScreenProps<'Login'>): JSX.Element
                 </View>
 
                 <View>
-                    <Button 
+                    <Button
                         mode='contained-tonal'
-                        onPress={onLoginBtnPressed}
+                        onPress={() => refetch()}
                     >
                         로그인
                     </Button>
