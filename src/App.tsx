@@ -1,25 +1,45 @@
-import React from 'react';
-import Main from './screens/Main';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './screens/Login';
-import Register from './screens/Register';
-import Home from './screens/Home';
-import { RootStackParamList } from './navigation/types';
-import ClaimLocker from './screens/Claim/ClaimLocker';
+import React, { useEffect } from 'react';
+import Toast from 'react-native-toast-message';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Intro from './screens/Intro';
+import { PaperProvider, configureFonts } from 'react-native-paper';
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      const msg = query.meta ? query.meta.errorMessage as string : '';
+
+      console.log('[QueryClient] error: ', error);
+
+      Toast.show({
+        type: 'error',
+        text1: '문제가 발생했습니다.',
+        text2: msg
+      });
+    }
+  }),
+})
 
 export default function App(): JSX.Element {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
+  useEffect(() => {
+    console.log('[App] started');
+  })
+  const baseFont = {
+    fontFamily: 'PretendardVariable',
+  }
+
+  const baseVariants = configureFonts({ config: baseFont });
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
-        <Stack.Screen name="Main" component={Main} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ClaimLocker" component={ClaimLocker} options={{headerShown: false}}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <PaperProvider theme={{
+          fonts: baseVariants
+        }}>
+          <Intro />
+        </PaperProvider>
+      </QueryClientProvider>
+      <Toast />
+    </>
   );
 }
