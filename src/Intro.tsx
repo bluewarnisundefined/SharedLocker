@@ -3,11 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QueryCache, QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { RootStackParamList } from '@/navigation/types';
-import Home from './Home';
-import ClaimLocker from './Claim/ClaimLocker';
-import Main from './Main';
-import Login from './Login';
-import Register from './Register';
+import Home from './screens/Home';
+import ClaimLocker from './screens/Claim/ClaimLocker';
+import Main from './screens/Main';
+import Login from './screens/Login';
+import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import { getSecureToken, removeAllSecureToken, setSecureToken, setSecureTokens } from '@/utils/keychain';
 
