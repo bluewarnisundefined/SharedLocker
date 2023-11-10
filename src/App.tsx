@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Toast from 'react-native-toast-message';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Intro from './screens/Intro';
+import Intro from './Intro';
 import { PaperProvider, configureFonts } from 'react-native-paper';
 
 const queryClient = new QueryClient({
