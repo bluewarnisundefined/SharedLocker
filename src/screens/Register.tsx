@@ -1,4 +1,8 @@
-import React from 'react';
+import { RootStackScreenProps } from '@/navigation/types';
+import authAPI from '@/network/auth/api';
+import { useMutation } from '@tanstack/react-query';
+// import { handleNetworkError } from '@/utils/axios';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
     Button,
@@ -6,15 +10,33 @@ import {
     Text,
     TextInput,
 } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
-export default function Register(): JSX.Element {
-    const [checked, setChecked] = React.useState(false);
+export default function Register(props: RootStackScreenProps<'Register'>): JSX.Element {
+    const [checked, setChecked] = useState(false);
+    const [name, setName] = useState('');
+    const [id, setId] = useState('');
+    const [password, setPassword] = useState('');
+
+    const mutation = useMutation({
+        mutationFn: () => {
+            return authAPI().signUp(id, password, name)
+        },
+        onSuccess: (data, variables) => {
+            const _data = data.data;
+
+            if(_data.success){
+                Toast.show({
+                    type: 'success',
+                    text2: _data.message
+                });
+                props.navigation.navigate('Main');
+            }
+        }
+    })
+
     return (
         <ScrollView style={{
-            // width: '100%',
-            // height: '100%',
-            // justifyContent: 'center',
-            // gap: 64,
             padding: 16,
         }}>
             <View style={{
@@ -32,12 +54,10 @@ export default function Register(): JSX.Element {
                     style={{
                         gap: 14,
                     }}>
-                    <TextInput placeholder='이름' />
-                    <TextInput placeholder='아이디' />
-                    <TextInput placeholder='비밀번호' />
-                    <TextInput placeholder='비밀번호 재입력' />
-
-
+                    <TextInput placeholder='이름' onChangeText={newText => setName(newText)}/>
+                    <TextInput placeholder='아이디' onChangeText={newText => setId(newText)}/>
+                    <TextInput placeholder='비밀번호' onChangeText={newText => setPassword(newText)}/>
+                    <TextInput placeholder='비밀번호 재입력' onChangeText={newText => setPassword(newText)}/>
                 </View>
 
                 <View style={{
@@ -55,7 +75,7 @@ export default function Register(): JSX.Element {
                 </View>
 
                 <View>
-                    <Button mode='contained-tonal'>
+                    <Button mode='contained-tonal' onPress={() => {mutation.mutate()}}>
                         회원가입
                     </Button>
                 </View>
