@@ -1,8 +1,9 @@
 import { RootStackScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
+import userAPI from '@/network/user/api';
 import { removeAllSecureToken } from '@/utils/keychain';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
     Button,
@@ -12,21 +13,38 @@ import {
 import QRCode from 'react-native-qrcode-svg';
 
 export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
-    const { status, data, refetch } = useQuery(['auth'], () => authAPI().signOut(), {
+    const { status: authStatus, data: authData, refetch: authRefetch } = useQuery(['auth'], () => authAPI().signOut(), {
         enabled: false,
         retry: false
     });
 
-    useEffect(() => {
-        if(status == 'success' && data){
-            const _data = data.data;
+    const { data: userLocker } = useQuery(
+        ['userLocker'],
+        () => userAPI().locker(),
+    )
 
-            if(_data && _data.success){
+    const userLockerName = useCallback(() => {
+        const locker = userLocker?.data.locker;
+
+        if (!locker) return '';
+
+        const building = locker.building;
+        const floorNum = locker.floorNumber;
+        const lockerNum = locker.lockerNumber;
+
+        return `${building} ${floorNum}층 ${lockerNum}번`
+    }, [userLocker]);
+
+    useEffect(() => {
+        if (authStatus == 'success' && authData) {
+            const _data = authData.data;
+
+            if (_data && _data.success) {
                 const tokenExist = _data.token ? true : false;
-                if(!tokenExist) removeAllSecureToken();
+                if (!tokenExist) removeAllSecureToken();
             }
         }
-    }, [status, data])
+    }, [authStatus, authData])
 
     return (
         <ScrollView style={{
@@ -35,7 +53,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
             <Card mode='contained' style={{
                 padding: 8
             }}>
-                <Card.Title title="보관함" />
+                <Card.Title title="사용중인 보관함" />
                 <Card.Content>
                     <View style={{
                         margin: 16,
@@ -53,24 +71,45 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
                         <Text style={{
                             fontWeight: 'bold'
                         }}>
-                            정보공학관-8-4
+                            {userLockerName()}
                         </Text>
                     </View>
-
                 </Card.Content>
             </Card>
-            <Button 
-                mode='outlined' 
+            {
+                userLocker?.data.success ? (
+                    <Button
+                        mode='outlined'
+                        onPress={() => {
+
+                        }}
+                    >
+                        보관함 삭제 (아직 구현 안됨)
+                    </Button>
+                ) : (
+                    <Button
+                        mode='outlined'
+                        onPress={() => {
+                            props.navigation.navigate('ClaimLocker');
+                        }}
+                    >
+                        보관함 신청
+                    </Button>
+                )
+            }
+
+            <Button
+                mode='outlined'
                 onPress={() => {
-                    props.navigation.navigate('ClaimLocker');
+                    props.navigation.navigate('ShareLocker');
                 }}
             >
-                ClaimLocker
+                보관함 공유
             </Button>
-            <Button 
-                mode='outlined' 
+            <Button
+                mode='outlined'
                 onPress={() => {
-                    refetch();
+                    authRefetch();
                 }}
             >
                 로그아웃

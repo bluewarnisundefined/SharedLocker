@@ -10,6 +10,7 @@ import Login from './screens/Login';
 import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import { getSecureToken, removeAllSecureToken, setSecureToken, setSecureTokens } from '@/utils/keychain';
+import ShareLocker from './screens/ShareLocker';
 
 export default function Intro(): JSX.Element {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -61,6 +62,7 @@ export default function Intro(): JSX.Element {
                         <>
                             <Stack.Screen name="Home" component={Home} />
                             <Stack.Screen name="ClaimLocker" component={ClaimLocker} options={{ headerShown: false }} />
+                            <Stack.Screen name="ShareLocker" component={ShareLocker} options={{ headerShown: false }}/>
                         </>
                     ) :
                     (

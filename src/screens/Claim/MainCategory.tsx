@@ -1,17 +1,27 @@
-import react, { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import Step from '@/components/Step';
 import { Button, Surface } from 'react-native-paper';
-import { View } from 'react-native';
 import { ClaimStackScreenProps } from '@/navigation/types';
+import { useQuery } from '@tanstack/react-query';
+import lockerAPI from '@/network/locker/api';
+import { IBuildings } from '@/network/locker/types';
 
 export default function MainCategory({ navigation }: ClaimStackScreenProps<'Main'>) {
-    const [sel, setSel] = useState('');
-    
-    useEffect(() => {
-        if(sel == '') return;
+    const { data } = useQuery(['buildings'], () => lockerAPI().buildings());
 
-        navigation.navigate('Sub', {mainSel: sel});
-    }, [sel]);
+    const buildingList = useCallback(() => {
+        if(!data) return [];
+
+        const _data: IBuildings = data.data;
+
+        return (
+            _data.map(e => <Button key={e} mode='contained' onPress={() => onButtonPressed(e)}>{e}</Button>)
+        )
+    }, [data])
+
+    const onButtonPressed = useCallback((selection: string) => {
+        navigation.navigate('Sub', {buildingSelection: selection});
+    }, []);
 
     return (
         <Step 
@@ -24,13 +34,7 @@ export default function MainCategory({ navigation }: ClaimStackScreenProps<'Main
                     gap: 18
                 }}
             >
-                <Button mode='contained' onPress={() => setSel('정보공학관')}>정보공학관</Button>
-                <Button mode='contained' onPress={() => setSel('지천관')}>지천관</Button>
-                <Button mode='contained' onPress={() => setSel('중앙도서관')}>중앙도서관</Button>
-                <Button mode='contained' onPress={() => setSel('공학관')}>공학관</Button>
-                <Button mode='contained' onPress={() => setSel('제1인문관')}>제1인문관</Button>
-                <Button mode='contained' onPress={() => setSel('법정관')}>법정관</Button>
-                <Button mode='contained' onPress={() => setSel('국제관')}>국제관</Button>
+                {buildingList()}
             </Surface>
         </Step>
     )

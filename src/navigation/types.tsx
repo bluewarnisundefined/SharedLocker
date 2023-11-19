@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Register: undefined;
   Home: undefined;
   ClaimLocker: undefined;
+  ShareLocker: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -15,8 +16,11 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type ClaimStackParamList = {
   Main: undefined;
-  Sub: {mainSel: string};
-  Detail: {subSel: number};
+  Sub: { buildingSelection: string };
+  Detail: {
+    buildingSelection: string,
+    floorSelection: number
+  };
 };
 
 export type ClaimStackScreenProps<T extends keyof ClaimStackParamList> =
