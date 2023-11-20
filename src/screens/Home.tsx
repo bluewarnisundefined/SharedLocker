@@ -26,7 +26,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     const userLockerName = useCallback(() => {
         const locker = userLocker?.data.locker;
 
-        if (!locker) return '';
+        if (!locker) return '사용중인 보관함이 없습니다.';
 
         const building = locker.building;
         const floorNum = locker.floorNumber;
@@ -77,7 +77,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
                 </Card.Content>
             </Card>
             {
-                userLocker?.data.success ? (
+                userLocker?.data.locker ? (
                     <Button
                         mode='outlined'
                         onPress={() => {
@@ -98,14 +98,20 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
                 )
             }
 
-            <Button
-                mode='outlined'
-                onPress={() => {
-                    props.navigation.navigate('ShareLocker');
-                }}
-            >
-                보관함 공유
-            </Button>
+            {
+                userLocker?.data.locker ? (
+                    <Button
+                        mode='outlined'
+                        onPress={() => {
+                            props.navigation.navigate('ShareLocker');
+                        }}
+                    >
+                        보관함 공유
+                    </Button>
+                ) : (
+                    null
+                )
+            }
             <Button
                 mode='outlined'
                 onPress={() => {
