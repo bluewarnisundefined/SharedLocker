@@ -37,6 +37,8 @@ export default function DetailCategory({ route, navigation }: ClaimStackScreenPr
         const data = claimData.data;
         const locker : ILocker = data.locker;
 
+        if(!locker) return;
+
         if(data.success) {
             Toast.show({
                 type: 'success',
