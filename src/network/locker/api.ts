@@ -17,12 +17,12 @@ const lockerAPI = () => ({
     claimLockers: (buildingName: string, floorNumber: number, lockerNumber: number) => {
         return axiosInstance.post('/api/lockers', { buildingName, floorNumber, lockerNumber })
     },
-    shareLocker: (share: {buildingName: string, floorNumber: number, lockerNumber: number, sharedWith: string}) => {
+    shareLocker: (buildingName: string, floorNumber: number, lockerNumber: number, sharedWith: string) => {
         return axiosInstance.post('/api/lockers/share', { 
-            buildingName: share.buildingName, 
-            floorNumber: share.floorNumber, 
-            lockerNumber: share.lockerNumber, 
-            sharedWith: share.sharedWith
+            buildingName: buildingName, 
+            floorNumber: floorNumber, 
+            lockerNumber: lockerNumber, 
+            sharedWith: sharedWith
         })
     }
 })
