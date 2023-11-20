@@ -2,7 +2,7 @@ import { RootStackScreenProps } from '@/navigation/types';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
     Button,
@@ -12,41 +12,59 @@ import {
 import Toast from 'react-native-toast-message';
 
 export default function ShareLocker(props: RootStackScreenProps<'ShareLocker'>): JSX.Element {
-    const [sharedWith, setSharedWith] = useState('');
+    const buildingName = useRef('');
+    const floorNumber = useRef(0);
+    const lockerNumber = useRef(0);
+    const [sharedWith, setSharedWith]  = useState('');
 
     const { isSuccess, data: userLocker } = useQuery(
         ['userLocker'],
         () => userAPI().locker(),
     )
-    const mutation = useMutation({
-        mutationFn: (share: {buildingName: string, floorNumber: number, lockerNumber: number, sharedWith: string}) => {
-            return lockerAPI().shareLocker(share)
-        },
-        onSuccess: (data, variables) => {
-            const _data = data.data;
 
-            if(_data.success){
-                Toast.show({
-                    type: 'success',
-                    text2: _data.message
-                });
-                props.navigation.navigate('Home');
-            }
+    const { data: shareLockerData, refetch: refetchShareRequest } = useQuery(
+        ['shareLocker'],
+        () => lockerAPI().shareLocker(
+            buildingName.current, 
+            floorNumber.current, 
+            lockerNumber.current, 
+            sharedWith
+        ),
+        {
+            enabled: false,
+            retry: false
         }
-    })
+    )
 
     const onButtonPressed = useCallback(() => {
         if(!isSuccess) return;
 
         const locker = userLocker?.data.locker;
 
-        const buildingName = locker.building;
-        const floorNumber = locker.floorNumber;
-        const lockerNumber = locker.lockerNumber;
+        buildingName.current = locker.building;
+        floorNumber.current = locker.floorNumber;
+        lockerNumber.current = locker.lockerNumber;
 
-        mutation.mutate({buildingName, floorNumber, lockerNumber, sharedWith});
+        refetchShareRequest();
 
-    }, [userLocker, isSuccess, sharedWith])
+    }, [userLocker, isSuccess])
+
+    useEffect(() => {
+        if(!shareLockerData) return;
+
+        console.log('[ShareLocker] shareLockerData.data: ', shareLockerData);
+
+        const data = shareLockerData.data;
+
+        if(data.success){
+            Toast.show({
+                type: 'success',
+                text1: '성공',
+                text2: data.message
+            });
+            props.navigation.navigate('Home');
+        }
+    }, [shareLockerData])
 
     return (
         <ScrollView style={{
