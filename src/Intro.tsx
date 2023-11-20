@@ -21,7 +21,8 @@ export default function Intro(): JSX.Element {
         useQuery(['auth'], () => authAPI().refreshToken(), {
             // 캐시 유효기간을 4초로 설정하여 비슷한 시간에 여러번 요청되는 경우를 방지.
             staleTime: 1000 * 4,
-            enabled: rfToken != ''
+            enabled: rfToken != '',
+            retry: false
         });
 
     useEffect(() => {
