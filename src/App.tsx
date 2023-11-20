@@ -3,21 +3,23 @@ import Toast from 'react-native-toast-message';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Intro from './Intro';
 import { PaperProvider, configureFonts } from 'react-native-paper';
+import { AxiosError, isAxiosError } from 'axios';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
-      const msg = query.meta ? query.meta.errorMessage as string : '';
+      if (isAxiosError(error)) {
+        const data: any = (error as AxiosError).response?.data;
+        data.message;
 
-      console.log('[QueryClient] error: ', error);
-
-      Toast.show({
-        type: 'error',
-        text1: '문제가 발생했습니다.',
-        text2: msg
-      });
+        Toast.show({
+          type: 'error',
+          text1: '문제가 발생했습니다.',
+          text2: data.message
+        });
+      }
     }
-  }),
+  })
 })
 
 export default function App(): JSX.Element {
