@@ -1,3 +1,4 @@
+import { ILockerWithUserInfo } from '@/types/locker';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -8,7 +9,7 @@ export type RootStackParamList = {
   Register: undefined;
   Home: undefined;
   ClaimLocker: undefined;
-  ShareLocker: undefined;
+  ShareLocker: ILockerWithUserInfo;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

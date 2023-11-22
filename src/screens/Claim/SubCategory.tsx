@@ -1,10 +1,10 @@
-import react, { useCallback, useEffect, useState } from 'react';
+import react, { useCallback } from 'react';
 import Step from '@/components/Step';
 import { Button } from 'react-native-paper';
 import { ClaimStackScreenProps } from '@/navigation/types';
 import { useQuery } from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import { IFloors } from '@/network/locker/types';
+import { IFloors } from '@/types/locker';
 
 export default function SubCategory({ route, navigation }: ClaimStackScreenProps<'Sub'>) {
     const { buildingSelection } = route.params;

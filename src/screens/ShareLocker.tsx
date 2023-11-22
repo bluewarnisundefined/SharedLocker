@@ -1,7 +1,9 @@
 import { RootStackScreenProps } from '@/navigation/types';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
+import { ILocker } from '@/types/locker';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
@@ -12,59 +14,55 @@ import {
 import Toast from 'react-native-toast-message';
 
 export default function ShareLocker(props: RootStackScreenProps<'ShareLocker'>): JSX.Element {
-    const buildingName = useRef('');
-    const floorNumber = useRef(0);
-    const lockerNumber = useRef(0);
+    const selectedLocker = props.route.params;
     const [sharedWith, setSharedWith]  = useState('');
 
-    const { isSuccess, data: userLocker } = useQuery(
-        ['userLocker'],
-        () => userAPI().locker(),
-    )
+    const shareMutation = useMutation({
+        mutationFn: (locker: ILocker) => {
+            return lockerAPI().shareLocker(
+                locker.building,
+                locker.floorNumber,
+                locker.lockerNumber,
+                sharedWith
+            )
+        },
+        onSuccess: (shareLockerData, variables) => {
+            if (!shareLockerData) return;
 
-    const { data: shareLockerData, refetch: refetchShareRequest } = useQuery(
-        ['shareLocker'],
-        () => lockerAPI().shareLocker(
-            buildingName.current, 
-            floorNumber.current, 
-            lockerNumber.current, 
-            sharedWith
-        ),
-        {
-            enabled: false,
-            retry: false
-        }
-    )
+            console.log('[ShareLocker] shareLockerData.data: ', shareLockerData);
+
+            const data = shareLockerData.data;
+
+            if (data.success) {
+                Toast.show({
+                    type: 'success',
+                    text1: '성공',
+                    text2: data.message
+                });
+                props.navigation.navigate('Home');
+            }
+        },
+        onError(error, variables, context) {
+            if(isAxiosError(error)){
+                console.log(error.toJSON());
+                Toast.show({
+                    type: 'error',
+                    text2: error.response?.data.message
+                });
+            }
+        },
+    })
 
     const onButtonPressed = useCallback(() => {
-        if(!isSuccess) return;
+        shareMutation.mutate(selectedLocker);
 
-        const locker = userLocker?.data.locker;
+    }, [selectedLocker])
 
-        buildingName.current = locker.building;
-        floorNumber.current = locker.floorNumber;
-        lockerNumber.current = locker.lockerNumber;
-
-        refetchShareRequest();
-
-    }, [userLocker, isSuccess])
-
-    useEffect(() => {
-        if(!shareLockerData) return;
-
-        console.log('[ShareLocker] shareLockerData.data: ', shareLockerData);
-
-        const data = shareLockerData.data;
-
-        if(data.success){
-            Toast.show({
-                type: 'success',
-                text1: '성공',
-                text2: data.message
-            });
-            props.navigation.navigate('Home');
-        }
-    }, [shareLockerData])
+    const getSharedUserList = useCallback(() => {
+        return selectedLocker.sharedWith.map(e => {
+            return <Text>{e.username}</Text>
+        })
+    }, [selectedLocker]);
 
     return (
         <ScrollView style={{
@@ -92,6 +90,9 @@ export default function ShareLocker(props: RootStackScreenProps<'ShareLocker'>):
                     <Button mode='contained-tonal' onPress={() => onButtonPressed()}>
                         등록
                     </Button>
+                </View>
+                <View>
+                    {getSharedUserList()}
                 </View>
             </View>
 

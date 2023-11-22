@@ -4,7 +4,7 @@ import { Button, Surface } from 'react-native-paper';
 import { ClaimStackScreenProps } from '@/navigation/types';
 import { useQuery } from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import { IBuildings } from '@/network/locker/types';
+import { IBuildings } from '@/types/locker';
 
 export default function MainCategory({ navigation }: ClaimStackScreenProps<'Main'>) {
     const { data } = useQuery(['buildings'], () => lockerAPI().buildings());
