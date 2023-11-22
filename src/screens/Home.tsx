@@ -1,16 +1,20 @@
 import { RootStackScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import userAPI from '@/network/user/api';
+import { ILockerWithUserInfo } from '@/types/locker';
 import { removeAllSecureToken } from '@/utils/keychain';
+import { useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
     Button,
     Card,
     Text,
 } from 'react-native-paper';
+import DropDown from 'react-native-paper-dropdown';
 import QRCode from 'react-native-qrcode-svg';
+import Toast from 'react-native-toast-message';
 
 export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     const { status: authStatus, data: authData, refetch: authRefetch } = useQuery(['auth'], () => authAPI().signOut(), {
@@ -18,22 +22,45 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
         retry: false
     });
 
-    const { data: userLocker } = useQuery(
+    // 유저 소유 보관함.
+    const { data: userLockerData, refetch: userLockerRefetch } = useQuery(
         ['userLocker'],
         () => userAPI().locker(),
+        {
+            cacheTime: 0
+        }
     )
 
-    const userLockerName = useCallback(() => {
-        const locker = userLocker?.data.locker;
+    // 유저가 공유받은 보관함.
+    // TODO
 
-        if (!locker) return '사용중인 보관함이 없습니다.';
+    // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
+    const [userLocker, setUserLocker] = useState<Map<string, ILockerWithUserInfo>>(new Map());
+    const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
+    const [showDropDown, setShowDropDown] = useState(false);
+    const [selLocker, setSelLocker] = useState<string>();
 
-        const building = locker.building;
-        const floorNum = locker.floorNumber;
-        const lockerNum = locker.lockerNumber;
+    useFocusEffect(useCallback(() => {
+        userLockerRefetch();
+    }, []))
 
-        return `${building} ${floorNum}층 ${lockerNum}번`
-    }, [userLocker]);
+    useEffect(() => {
+        const locker: ILockerWithUserInfo = userLockerData?.data.locker[0];
+
+        if(!locker) {
+            setUserLocker(new Map());
+            setSelLocker('');
+            return;
+        }
+
+        const lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+
+        setUserLocker(map => {
+            return map.set(lockerKey, locker);
+        });
+
+        setSelLocker(lockerKey);
+    }, [userLockerData]);
 
     useEffect(() => {
         if (authStatus == 'success' && authData) {
@@ -45,6 +72,33 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
             }
         }
     }, [authStatus, authData])
+
+    const getLockerList = useCallback(() => {
+        const res: any[] = [];
+
+        userLocker.forEach((value, key, map) => {
+            res.push({
+                label: `${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
+                value: key
+            })
+        });
+
+        return res;
+    }, [userLocker])
+
+    const getCurrentLockerString = useCallback(() => {
+        if(typeof selectedLocker === 'undefined') return;
+        return `${selectedLocker?.building}-${selectedLocker?.floorNumber}-${selectedLocker?.lockerNumber}`
+    }, [selectedLocker])
+
+    useEffect(() => {
+        if(!selLocker || selLocker === '') {
+            setSelectedLocker(undefined);
+            return;
+        }
+
+        setSelectedLocker(userLocker.get(selLocker))
+    }, [userLocker, selLocker]);
 
     return (
         <ScrollView style={{
@@ -62,22 +116,26 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
                         gap: 8
                     }}>
                         <QRCode
-                            value="http://awesome.link.qr"
+                            value={getCurrentLockerString()}
                             logoBackgroundColor='transparent'
                         />
-                        <Text>ABC 123</Text>
                     </View>
                     <View>
-                        <Text style={{
-                            fontWeight: 'bold'
-                        }}>
-                            {userLockerName()}
-                        </Text>
+                        <DropDown
+                            label={"보관함을 선택하세요"}
+                            mode={"outlined"}
+                            visible={showDropDown}
+                            showDropDown={() => setShowDropDown(true)}
+                            onDismiss={() => setShowDropDown(false)}
+                            value={selLocker}
+                            setValue={setSelLocker}
+                            list={getLockerList()}
+                        />
                     </View>
                 </Card.Content>
             </Card>
             {
-                userLocker?.data.locker ? (
+                userLocker.size > 0 ? (
                     <Button
                         mode='outlined'
                         onPress={() => {
@@ -99,11 +157,19 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
             }
 
             {
-                userLocker?.data.locker ? (
+                userLocker.size > 0 ? (
                     <Button
                         mode='outlined'
                         onPress={() => {
-                            props.navigation.navigate('ShareLocker');
+                            if(!selectedLocker) {
+                                Toast.show({
+                                    type: 'warning',
+                                    text1: '오류',
+                                    text2: '보관함 정보가 없습니다.'
+                                })
+                                return;
+                            }
+                            props.navigation.navigate('ShareLocker', selectedLocker);
                         }}
                     >
                         보관함 공유
