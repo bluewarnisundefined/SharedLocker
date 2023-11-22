@@ -9,8 +9,11 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       if (isAxiosError(error)) {
-        const data: any = (error as AxiosError).response?.data;
-        data.message;
+        const err: AxiosError = error;
+        const res = err.response;
+        const data: any = res?.data;
+        
+        if(err.config?.url === '/auth/token') return;
 
         Toast.show({
           type: 'error',
