@@ -16,10 +16,10 @@
 
 ## 기술 스택
 
-백엔드: Node.js, Express.js
-데이터베이스: MongoDB
-인증 및 보안: Passport.js, JWT
-프론트엔드: React.js, React Native
+- 백엔드: Node.js, Express.js
+- 데이터베이스: MongoDB
+- 인증 및 보안: Passport.js, JWT
+- 프론트엔드: React.js, React Native
 
 ## 개발 환경 구성
 
