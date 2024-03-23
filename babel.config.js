@@ -6,11 +6,11 @@ module.exports = {
       {
         root: ['./src'],
         alias: {
-          "@components": "./src/components",
-          "@screens": "./src/screens",
-          "@network": "./src/network",
-          "@assets": "./src/assets",
-          "@utils": "./src/utils",
+          '@components': './src/components',
+          '@screens': './src/screens',
+          '@network': './src/network',
+          '@assets': './src/assets',
+          '@utils': './src/utils',
           '@': './src',
         },
       },

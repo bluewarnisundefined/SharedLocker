@@ -1,34 +1,46 @@
-import react, { useCallback } from 'react';
+import {useCallback} from 'react';
 import Step from '@/components/Step';
-import { Button } from 'react-native-paper';
-import { ClaimStackScreenProps } from '@/navigation/types';
-import { useQuery } from '@tanstack/react-query';
+import {Button} from 'react-native-paper';
+import {ClaimStackScreenProps} from '@/navigation/types';
+import {useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import { IFloors } from '@/types/locker';
+import {IFloors} from '@/types/locker';
 
-export default function SubCategory({ route, navigation }: ClaimStackScreenProps<'Sub'>) {
-    const { buildingSelection } = route.params;
-    
-    const { data } = useQuery(['buildings', buildingSelection], () => lockerAPI().floors(buildingSelection));
+export default function SubCategory({
+  route,
+  navigation,
+}: ClaimStackScreenProps<'Sub'>) {
+  const {buildingSelection} = route.params;
 
-    const floorList = useCallback(() => {
-        if (!data) return [];
+  const {data} = useQuery(['buildings', buildingSelection], () =>
+    lockerAPI().floors(buildingSelection),
+  );
 
-        const _data: IFloors = data.data;
-        const sortedData = _data.sort((a, b) => a - b);
+  const onButtonPressed = useCallback(
+    (selection: number) => {
+      navigation.navigate('Detail', {
+        buildingSelection,
+        floorSelection: selection,
+      });
+    },
+    [buildingSelection, navigation],
+  );
 
-        return (
-            sortedData.map(e => <Button key={e} mode='contained' onPress={() => onButtonPressed(e)}>{`${e}층`}</Button>)
-        )
-    }, [data])
+  const floorList = useCallback(() => {
+    if (!data) {
+      return [];
+    }
 
-    const onButtonPressed = useCallback((selection: number) => {
-        navigation.navigate('Detail', {buildingSelection, floorSelection: selection});
-    }, []);
+    const _data: IFloors = data.data;
+    const sortedData = _data.sort((a, b) => a - b);
 
-    return (
-        <Step title='층수를 선택하세요'>
-            {floorList()}
-        </Step>
-    )
+    return sortedData.map(e => (
+      <Button
+        key={e}
+        mode="contained"
+        onPress={() => onButtonPressed(e)}>{`${e}층`}</Button>
+    ));
+  }, [data, onButtonPressed]);
+
+  return <Step title="층수를 선택하세요">{floorList()}</Step>;
 }

@@ -1,9 +1,9 @@
-import { axiosInstance } from '../client';
+import {axiosInstance} from '../client';
 
 const userAPI = () => ({
-    locker: () => {
-        return axiosInstance.get('/api/user/locker')
-    },
-})
+  locker: () => {
+    return axiosInstance.get('/api/user/locker');
+  },
+});
 
 export default userAPI;

@@ -1,7 +1,6 @@
-import { ILockerWithUserInfo } from '@/types/locker';
-import { CompositeScreenProps } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {ILockerWithUserInfo} from '@/types/locker';
+import {CompositeScreenProps} from '@react-navigation/native';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Main: undefined;
@@ -17,10 +16,10 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type ClaimStackParamList = {
   Main: undefined;
-  Sub: { buildingSelection: string };
+  Sub: {buildingSelection: string};
   Detail: {
-    buildingSelection: string,
-    floorSelection: number
+    buildingSelection: string;
+    floorSelection: number;
   };
 };
 
@@ -32,6 +31,6 @@ export type ClaimStackScreenProps<T extends keyof ClaimStackParamList> =
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList { }
+    interface RootParamList extends RootStackParamList {}
   }
 }
