@@ -19,7 +19,7 @@ const lockerAPI = () => ({
     floorNumber: number,
     lockerNumber: number,
   ) => {
-    return axiosInstance.post('/api/lockers', {
+    return axiosInstance.post('/api/locker', {
       buildingName,
       floorNumber,
       lockerNumber,
@@ -31,7 +31,7 @@ const lockerAPI = () => ({
     lockerNumber: number,
     sharedWith: string,
   ) => {
-    return axiosInstance.post('/api/lockers/share', {
+    return axiosInstance.post('/api/locker/share', {
       buildingName: buildingName,
       floorNumber: floorNumber,
       lockerNumber: lockerNumber,
