@@ -1,79 +1,46 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 스마트 공유 보관함 (Shared Locker)
 
-# Getting Started
+이 프로젝트는 공유 보관함 서비스의 프론트 엔드를 담당합니다.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+서버 프로젝트는 [여기](https://github.com/deepbluewarn/sharedlocker-server)에서 볼 수 있습니다.
 
-## Step 1: Start the Metro Server
+## 프로젝트 개요
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+이 프로젝트는 기존 보관함의 단점을 보완하고 추가적인 기능을 제공합니다.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+이 프로젝트는 다수의 사용자가 하나의 보관함을 함께 공유할 수 있는 서비스를 제공합니다.
+
+## 주요 기능
+
+- 보관함 신청 및 공유: 사용자는 원하는 보관함을 등록하고 다른 사용자와 공유할 수 있습니다.
+
+- 보관함 등록 및 관리: 사용자는 보관함을 등록하고 관리할 수 있습니다. 보관함의 위치, 크기, 용도 등의 정보를 입력하여 등록합니다.
+
+- QR 코드 생성: 보관함을 이용하기 위해 QR 코드를 생성할 수 있습니다. 사용자는 QR 코드를 인식하여 보관함의 잠금을 해제할 수 있습니다. 
+
+## 기술 스택
+
+- 백엔드: Node.js, Express.js
+- 데이터베이스: MongoDB, Redis
+- 인증 및 보안: Passport.js, JWT
+- 프론트엔드: React.js, React Native
+- UI: [react-native-paper](https://github.com/callstack/react-native-paper)
+
+## 개발 환경 구성
+
+이 프로젝트는 React Native 를 기반으로 작성되었습니다. [React Native 환경 설정](https://reactnative.dev/docs/environment-setup)을 참고하세요.
+
+## 사용법
+
+시작 전 프로젝트 루트 위치에 .env 파일을 생성하고 아래 항목을 작성합니다.
+
+|값|설명|
+|---|---|
+|APP_BASE_URL| [SharedLocker-Server](https://github.com/Deepbluewarn/SharedLocker-Server) 에서 제공하는 Node.js 기반의 API 서버 주소.
+
+Node.js 설치 후 아래 명령어를 실행합니다.
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+npm i
+npm run start
 ```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
