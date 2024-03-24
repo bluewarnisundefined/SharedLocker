@@ -1,140 +1,57 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type { PropsWithChildren } from 'react';
+import React, {useEffect} from 'react';
+import Toast from 'react-native-toast-message';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  useColorScheme,
-  View,
-} from 'react-native';
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import Intro from './Intro';
+import {PaperProvider, configureFonts} from 'react-native-paper';
+import {AxiosError, isAxiosError} from 'axios';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: error => {
+      if (isAxiosError(error)) {
+        const err: AxiosError = error;
+        const res = err.response;
+        const data: any = res?.data;
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+        if (err.config?.url === '/auth/token') {
+          return;
+        }
 
-function Section({ children, title }: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): JSX.Element {
-  const [text, onChangeText] = React.useState('Useless Text');
-  const [number, onChangeNumber] = React.useState('');
-
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  const styles = StyleSheet.create({
-    input: {
-      height: 40,
-      margin: 12,
-      borderWidth: 1,
-      padding: 10,
+        Toast.show({
+          type: 'error',
+          text1: '문제가 발생했습니다.',
+          text2: data?.message,
+        });
+      }
     },
-    baseText: {
-      fontFamily: 'Cochin',
-    },
-    titleText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      
-    },
-  });
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            
-          }}>
-          <Text style={styles.baseText}>
-            <Text style={styles.titleText}>로그인</Text>
-          </Text>
-          <TextInput
-              style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
-            />
-            <TextInput
-              style={styles.input}
-              onChangeText={onChangeNumber}
-              value={number}
-              placeholder="useless placeholder"
-              keyboardType="numeric"
-            />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+  }),
 });
 
-export default App;
+export default function App(): JSX.Element {
+  useEffect(() => {
+    console.log('[App] started');
+  });
+  const baseFont = {
+    fontFamily: 'PretendardVariable',
+  };
+
+  const baseVariants = configureFonts({config: baseFont});
+
+  return (
+    <>
+      <QueryClientProvider client={queryClient}>
+        <PaperProvider
+          theme={{
+            fonts: baseVariants,
+          }}>
+          <Intro />
+        </PaperProvider>
+      </QueryClientProvider>
+      <Toast />
+    </>
+  );
+}
