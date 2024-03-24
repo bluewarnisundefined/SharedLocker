@@ -25,7 +25,7 @@ export default function Register(
       if (_data.success) {
         Toast.show({
           type: 'success',
-          text2: _data.message,
+          text2: _data?.message,
         });
         props.navigation.navigate('Main');
       }

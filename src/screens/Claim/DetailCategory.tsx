@@ -28,16 +28,16 @@ export default function DetailCategory({
       ),
     onSuccess: claimData => {
       const _data = claimData.data;
-      const locker: ILocker = _data.locker;
+      const locker: ILocker = _data?.locker;
 
       if (!locker) {
         return;
       }
 
-      if (data.success) {
+      if (_data?.success) {
         Toast.show({
           type: 'success',
-          text2: data.message,
+          text2: _data?.message,
         });
         navigation.navigate('Home');
       }

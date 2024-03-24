@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
         Toast.show({
           type: 'error',
           text1: '문제가 발생했습니다.',
-          text2: data.message,
+          text2: data?.message,
         });
       }
     },

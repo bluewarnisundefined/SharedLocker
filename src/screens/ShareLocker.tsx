@@ -36,7 +36,7 @@ export default function ShareLocker(
         Toast.show({
           type: 'success',
           text1: '성공',
-          text2: data.message,
+          text2: data?.message,
         });
         props.navigation.navigate('Home');
       }
