@@ -10,7 +10,7 @@ const authAPI = () => ({
   },
   signOut: () => {
     // Authorization 헤더는 요청 인터셉터에서 정의 됨.
-    return axiosInstance.post('/auth/logout', null);
+    return axiosInstance.post('/auth/logout', {});
   },
   signUp: (id: string, password: string, username: string) => {
     return axiosInstance.post('/auth/register', {
