@@ -9,7 +9,6 @@ export default function Login(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   props: RootStackScreenProps<'Login'>,
 ): JSX.Element {
-  const [checked, setChecked] = useState(false);
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,12 +30,23 @@ export default function Login(
           style={{
             marginTop: 64,
             marginBottom: 16,
-            gap: 8,
           }}>
           <Text variant="titleLarge" style={{fontWeight: 'bold'}}>
             로그인
           </Text>
-          <Text variant="titleSmall">계정이 없으신가요? 회원 가입</Text>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <Text variant="titleSmall">계정이 없으신가요?</Text>
+            <Button 
+              onPress={() => {
+                props.navigation.navigate('Register')
+              }}
+            >
+              회원 가입
+            </Button>
+          </View>
         </View>
         <View
           style={{
@@ -50,6 +60,7 @@ export default function Login(
           />
           <TextInput
             placeholder="비밀번호"
+            secureTextEntry={true}
             onChangeText={newText => {
               setPassword(newText);
             }}
@@ -60,13 +71,6 @@ export default function Login(
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Checkbox
-            status={checked ? 'checked' : 'unchecked'}
-            onPress={() => {
-              setChecked(!checked);
-            }}
-          />
-          <Text>로그인 유지</Text>
         </View>
 
         <View>

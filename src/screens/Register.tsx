@@ -87,7 +87,20 @@ export default function Register(
           <Text variant="titleLarge" style={{fontWeight: 'bold'}}>
             새로운 계정 생성
           </Text>
-          <Text variant="titleSmall">이미 계정이 있으신가요? 로그인</Text>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <Text variant="titleSmall">이미 계정이 있으신가요?</Text>
+            <Button 
+              onPress={() => {
+                props.navigation.navigate('Login')
+              }}
+            >
+              로그인
+            </Button>
+          </View>
+          
         </View>
         <View
           style={{
