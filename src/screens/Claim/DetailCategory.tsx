@@ -1,13 +1,14 @@
-import {useCallback, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import Step from '@/components/Step';
-import {Button} from 'react-native-paper';
+import {Button, Chip} from 'react-native-paper';
 import {ClaimStackScreenProps} from '@/navigation/types';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import {ILocker, ILockers} from '@/types/locker';
-import {Alert} from 'react-native';
+import {ILocker, ILockerWithStatus, LockerStatus} from '@/types/locker';
+import {Alert, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {isAxiosError} from 'axios';
+import { LockerStatusAttrMapper, LockerStatusAttributes } from '@/utils/mapper';
 
 export default function DetailCategory({
   route,
@@ -52,11 +53,17 @@ export default function DetailCategory({
     },
   });
 
-  const onButtonPressed = useCallback(
-    (floor: number) => {
+  const onLockerButtonPressed = useCallback(
+    (floor: number, lockerAttr: LockerStatusAttributes) => {
+      let message = ''
+      if (lockerAttr.status === LockerStatus.Share_Available) {
+        message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 공유 신청할까요?`
+      } else if (lockerAttr.status === LockerStatus.Empty) {
+        message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`
+      }
       Alert.alert(
         '보관함 신청',
-        `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`,
+        message,
         [
           {
             text: '취소',
@@ -81,16 +88,35 @@ export default function DetailCategory({
       return [];
     }
 
-    const _data: ILockers = data.data;
-    const sortedData = _data.sort((a, b) => a - b);
+    const _data: ILockerWithStatus[] = data.data;
+    const sortedData = _data.sort((a, b) => a.lockerNumber - b.lockerNumber);
 
-    return sortedData.map(e => (
-      <Button
-        key={e}
-        mode="contained"
-        onPress={() => onButtonPressed(e)}>{`${e}번`}</Button>
-    ));
-  }, [data, onButtonPressed]);
+    return sortedData.map(e => {
+      const statusAttr = LockerStatusAttrMapper(e.status);
+
+      return (
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+        }}>
+          <Button
+            key={e.lockerNumber}
+            mode="contained"
+            onPress={() => onLockerButtonPressed(e.lockerNumber, statusAttr)}
+            buttonColor={statusAttr.color}
+            disabled={statusAttr.disabled}
+            style={{ flex: 1 }}
+          >
+              {`${e.lockerNumber}번`}
+          </Button>
+          <Chip icon='information' mode='outlined'>{statusAttr.statusText}</Chip>
+        </View>
+        
+      )
+    });
+  }, [data, onLockerButtonPressed]);
 
   return <Step title="보관함 번호를 선택하세요">{floorList()}</Step>;
 }
