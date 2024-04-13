@@ -2,7 +2,7 @@ import {RootStackScreenProps} from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import {useMutation} from '@tanstack/react-query';
 // import { handleNetworkError } from '@/utils/axios';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {Button, Checkbox, Text, TextInput} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
@@ -14,6 +14,7 @@ export default function Register(
   const [name, setName] = useState('');
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -31,6 +32,42 @@ export default function Register(
       }
     },
   });
+
+  const beforeMutation = useCallback(() => {
+    if (!checked) {
+      Toast.show({
+        type: 'error',
+        text2: '이용약관에 동의해주세요.',
+      });
+      return false;
+    }
+
+    if(!name || !id) {
+      Toast.show({
+        type: 'error',
+        text2: '이름과 아이디를 입력해주세요.',
+      });
+      return false;
+    }
+
+    if (!password) {
+      Toast.show({
+        type: 'error',
+        text2: '비밀번호를 입력해주세요.',
+      });
+      return false;
+    }
+
+    if (password !== passwordCheck) {
+      Toast.show({
+        type: 'error',
+        text2: '비밀번호가 일치하지 않습니다.',
+      });
+      return false;
+    }
+
+    return true;
+  }, [name, id, password, passwordCheck, checked]);
 
   return (
     <ScrollView
@@ -50,7 +87,20 @@ export default function Register(
           <Text variant="titleLarge" style={{fontWeight: 'bold'}}>
             새로운 계정 생성
           </Text>
-          <Text variant="titleSmall">이미 계정이 있으신가요? 로그인</Text>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <Text variant="titleSmall">이미 계정이 있으신가요?</Text>
+            <Button 
+              onPress={() => {
+                props.navigation.navigate('Login')
+              }}
+            >
+              로그인
+            </Button>
+          </View>
+          
         </View>
         <View
           style={{
@@ -66,11 +116,14 @@ export default function Register(
           />
           <TextInput
             placeholder="비밀번호"
+            secureTextEntry={true}
             onChangeText={newText => setPassword(newText)}
           />
           <TextInput
             placeholder="비밀번호 재입력"
-            onChangeText={newText => setPassword(newText)}
+            secureTextEntry={true}
+            error={password !== passwordCheck}
+            onChangeText={newText => setPasswordCheck(newText)}
           />
         </View>
 
@@ -92,7 +145,7 @@ export default function Register(
           <Button
             mode="contained-tonal"
             onPress={() => {
-              mutation.mutate();
+              if (beforeMutation()) mutation.mutate();
             }}>
             회원가입
           </Button>
