@@ -38,6 +38,17 @@ const lockerAPI = () => ({
       sharedWith: sharedWith,
     });
   },
+  requestShareLocker: (
+    buildingName: string,
+    floorNumber: number,
+    lockerNumber: number,
+  ) => {
+    return axiosInstance.post('/api/locker/request-share', {
+      buildingName,
+      floorNumber,
+      lockerNumber,
+    });
+  },
 });
 
 export default lockerAPI;

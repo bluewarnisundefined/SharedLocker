@@ -53,13 +53,45 @@ export default function DetailCategory({
     },
   });
 
+  const requestShareLocker = useMutation({
+    mutationFn: () =>
+      lockerAPI().requestShareLocker(
+        buildingSelection,
+        floorSelection,
+        floorRef.current,
+      ),
+    onSuccess: shareRequestData => {
+      const _data = shareRequestData.data;
+
+      if (_data?.success) {
+        Toast.show({
+          type: 'success',
+          text2: _data?.message,
+        });
+        navigation.navigate('Home');
+      }
+    },
+    onError(error) {
+      if (isAxiosError(error)) {
+        Toast.show({
+          type: 'error',
+          text2: error.response?.data.message,
+        });
+      }
+    },
+  });
+
   const onLockerButtonPressed = useCallback(
     (floor: number, lockerAttr: LockerStatusAttributes) => {
       let message = ''
+      let mutation = null;
+      
       if (lockerAttr.status === LockerStatus.Share_Available) {
         message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 공유 신청할까요?`
+        mutation = requestShareLocker;
       } else if (lockerAttr.status === LockerStatus.Empty) {
         message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`
+        mutation = claimMutation;
       }
       Alert.alert(
         '보관함 신청',
@@ -73,8 +105,9 @@ export default function DetailCategory({
           {
             text: '신청',
             onPress: () => {
+              if(!mutation) return;
               floorRef.current = floor;
-              claimMutation.mutate();
+              mutation.mutate();
             },
           },
         ],
