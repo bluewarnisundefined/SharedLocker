@@ -188,19 +188,14 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
           </View>
         </Card.Content>
       </Card>
-      {userLocker.size > 0 ? (
-        <Button mode="outlined" onPress={() => {}}>
-          보관함 삭제 (아직 구현 안됨)
-        </Button>
-      ) : (
-        <Button
-          mode="outlined"
-          onPress={() => {
-            props.navigation.navigate('ClaimLocker');
-          }}>
-          보관함 신청
-        </Button>
-      )}
+      
+      <Button
+        mode="outlined"
+        onPress={() => {
+          props.navigation.navigate('ClaimLocker');
+        }}>
+        보관함 신청
+      </Button>
 
       {userLocker.size > 0 ? (
         <Button
