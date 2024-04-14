@@ -43,7 +43,7 @@ export default function Register(
     mutationFn: () => {
       return authAPI().signUp(id, password, name);
     },
-    onSuccess: data => () => {
+    onSuccess: data => {
       mutationSuccessHandler(data)
       props.navigation.navigate('Main');
     },
