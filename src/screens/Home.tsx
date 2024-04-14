@@ -29,7 +29,10 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   );
 
   // 유저가 공유받은 보관함.
-  // TODO
+  const {data: sharedLockerData, refetch: sharedLockerRefetch} = useQuery(
+    ['sharedLocker'],
+    () => userAPI().sharedLocker(),
+  )
 
   // QR Key 요청
   const { data: qrKeyData } = useQuery(['qrKey'], () => authAPI().qrKey(), {
@@ -56,26 +59,41 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   useFocusEffect(
     useCallback(() => {
       userLockerRefetch();
-    }, [userLockerRefetch]),
+      sharedLockerRefetch();
+    }, [userLockerRefetch, sharedLockerRefetch]),
   );
 
   useEffect(() => {
     const locker: ILockerWithUserInfo = userLockerData?.data.locker[0];
+    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData?.data.locker;
+    const combinedLocker = [...sharedLocker, locker].filter((locker) => {
+      return locker !== undefined;
+    });
+    let lockerKey = '';
 
-    if (!locker) {
+    if (!combinedLocker || combinedLocker.length === 0) {
       setUserLocker(new Map());
       setSelLocker('');
       return;
     }
 
-    const lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+    if(!locker) {
+      lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
+    }else{
+      lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+    }
 
     setUserLocker(map => {
-      return map.set(lockerKey, locker);
+      const newMap = new Map(map);
+
+      combinedLocker.forEach((locker) => {
+        newMap.set(`${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`, locker);
+      });
+      return newMap;
     });
 
     setSelLocker(lockerKey);
-  }, [userLockerData]);
+  }, [userLockerData, sharedLockerData]);
 
   useEffect(() => {
     if (authStatus === 'success' && authData) {
@@ -95,7 +113,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
     userLocker.forEach((value, key) => {
       res.push({
-        label: `${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
+        label: `[${value.owned ? '소유' : '공유'}] ${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
         value: key,
       });
     });
