@@ -31,6 +31,9 @@ const authAPI = () => ({
       refresh_token: token,
     });
   },
+  qrKey: async () => {
+    return axiosInstance.get('/auth/qrkey');
+  }
 });
 
 export default authAPI;

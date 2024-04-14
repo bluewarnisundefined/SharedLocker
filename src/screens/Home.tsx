@@ -7,7 +7,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
 import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, View} from 'react-native';
-import {Button, Card} from 'react-native-paper';
+import {Button, Card, Text} from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
@@ -30,6 +30,20 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
   // 유저가 공유받은 보관함.
   // TODO
+
+  // QR Key 요청
+  const { data: qrKeyData } = useQuery(['qrKey'], () => authAPI().qrKey(), {
+    refetchInterval: (data, query) => {
+      if(!data || !data.data.success) return false;
+
+      const _data = data.data;
+
+      const currentTime = new Date().getTime();
+      const expiresIn = _data.qrKey.expiredAt - currentTime;
+
+      return expiresIn;
+    }
+  });
 
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
   const [userLocker, setUserLocker] = useState<
@@ -89,12 +103,19 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     return res;
   }, [userLocker]);
 
-  const getCurrentLockerString = useCallback(() => {
+  const generateQRCode = useCallback(() => {
     if (typeof selectedLocker === 'undefined') {
       return;
     }
-    return `${selectedLocker?.building}-${selectedLocker?.floorNumber}-${selectedLocker?.lockerNumber}`;
-  }, [selectedLocker]);
+
+    if (!qrKeyData || !qrKeyData.data.success) return;
+
+    const lockerInfo = `${selectedLocker?.building}-${selectedLocker?.floorNumber}-${selectedLocker?.lockerNumber}`;
+
+    if (!lockerInfo) return;
+
+    return `${qrKeyData.data.qrKey.key}-${lockerInfo}`;
+  }, [selectedLocker, qrKeyData]);
 
   useEffect(() => {
     if (!selLocker || selLocker === '') {
@@ -124,10 +145,16 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
               alignItems: 'center',
               gap: 8,
             }}>
-            <QRCode
-              value={getCurrentLockerString()}
-              logoBackgroundColor="transparent"
-            />
+              {
+              generateQRCode() ? (
+                <QRCode
+                  value={generateQRCode()}
+                  logoBackgroundColor="transparent"
+                />
+                ) : (
+                  <Text>보관함을 선택하세요</Text>
+                )
+              }
           </View>
           <View>
             <DropDown
