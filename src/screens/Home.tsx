@@ -1,12 +1,14 @@
 import {RootStackScreenProps} from '@/navigation/types';
 import authAPI from '@/network/auth/api';
+import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
 import {ILockerWithUserInfo} from '@/types/locker';
 import {removeAllSecureToken} from '@/utils/keychain';
+import { mutationErrorHandler } from '@/utils/mutationHandler';
 import {useFocusEffect} from '@react-navigation/native';
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery} from '@tanstack/react-query';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import {Alert, ScrollView, View} from 'react-native';
 import {Button, Card, Text} from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import QRCode from 'react-native-qrcode-svg';
@@ -45,6 +47,36 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     }
   });
 
+  const cancelLockerMutation = useMutation({
+    mutationFn: (data: {
+      building: string,
+      floorNumber: number,
+      lockerNumber: number,
+      isOwner: boolean,
+    }) => {
+      return lockerAPI().cancelLocker(
+        data.building,
+        data.floorNumber,
+        data.lockerNumber,
+        data.isOwner,
+      );
+    },
+    onSuccess: (data) => {
+      if (data.data.success) {
+        Toast.show({
+          type: 'success',
+          text1: '성공',
+          text2: '보관함 취소가 완료되었습니다.',
+        });
+        userLockerRefetch();
+      }
+    },
+    onError: (error) => {
+      mutationErrorHandler(error);
+    }
+  })
+
+
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
   const [userLocker, setUserLocker] = useState<
     Map<string, ILockerWithUserInfo>
@@ -52,6 +84,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
   const [showDropDown, setShowDropDown] = useState(false);
   const [selLocker, setSelLocker] = useState<string>();
+  const [selLockerDesc, setSelLockerDesc] = useState<string>('');
 
   useFocusEffect(
     useCallback(() => {
@@ -69,11 +102,12 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
     }
 
     const lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+    const lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
 
     setUserLocker(map => {
       return map.set(lockerKey, locker);
     });
-
+    setSelLockerDesc(lockerDesc);
     setSelLocker(lockerKey);
   }, [userLockerData]);
 
@@ -116,6 +150,33 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
     return `${qrKeyData.data.qrKey.key}-${lockerInfo}`;
   }, [selectedLocker, qrKeyData]);
+
+  const cancelLocker = useCallback(() => {
+    if (!selectedLocker) return;
+
+    Alert.alert(
+      '보관함 취소',
+      `${selLockerDesc} 보관함 신청을 취소하시겠습니까?`,
+      [
+        {
+          text: '취소',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: () => {
+            cancelLockerMutation.mutate({
+              building: selectedLocker.building,
+              floorNumber: selectedLocker.floorNumber,
+              lockerNumber: selectedLocker.lockerNumber,
+              isOwner: true,
+            });
+          },
+        },
+      ],
+    );
+  }, [selLockerDesc, selectedLocker, cancelLockerMutation]);
 
   useEffect(() => {
     if (!selLocker || selLocker === '') {
@@ -171,7 +232,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
         </Card.Content>
       </Card>
       {userLocker.size > 0 ? (
-        <Button mode="outlined" onPress={() => {}}>
+        <Button mode="outlined" onPress={() => {cancelLocker()}}>
           보관함 삭제 (아직 구현 안됨)
         </Button>
       ) : (

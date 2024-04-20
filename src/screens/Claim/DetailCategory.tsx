@@ -29,7 +29,7 @@ export default function DetailCategory({
       ),
     onSuccess: claimData => {
       const _data = claimData.data;
-      const locker: ILocker = _data?.locker;
+      const locker: ILocker = _data?.data.locker;
 
       if (!locker) {
         return;

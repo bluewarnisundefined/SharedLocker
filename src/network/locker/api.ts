@@ -49,6 +49,21 @@ const lockerAPI = () => ({
       lockerNumber,
     });
   },
+  cancelLocker: (
+    buildingName: string,
+    floorNumber: number,
+    lockerNumber: number,
+    isOwner: boolean,
+  ) => {
+    return axiosInstance.delete('/api/locker/cancel', {
+      data: {
+        buildingName,
+        floorNumber,
+        lockerNumber,
+        isOwner
+      },
+    });
+  }
 });
 
 export default lockerAPI;
