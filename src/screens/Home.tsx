@@ -99,7 +99,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
   useEffect(() => {
     const locker: ILockerWithUserInfo = userLockerData?.data.locker[0];
-    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData?.data.locker;
+    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData?.data.locker || [];
     const combinedLocker = [...sharedLocker, locker].filter((locker) => {
       return locker !== undefined;
     });
