@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useQuery} from '@tanstack/react-query';
-import {RootStackParamList} from '@/navigation/types';
+import {RootStackParamList, RootTabParamList} from '@/navigation/types';
 import Home from './screens/Home';
 import ClaimLocker from './screens/Claim/ClaimLocker';
 import Main from './screens/Main';
@@ -11,11 +11,24 @@ import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import {getSecureToken, setSecureTokens} from '@/utils/keychain';
 import ShareLocker from './screens/ShareLocker';
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
+import { ILockerWithUserInfo } from './types/locker';
+
+interface ILockerScreenContext {
+  selectedLocker: ILockerWithUserInfo | undefined,
+  setSelectedLocker: React.Dispatch<React.SetStateAction<ILockerWithUserInfo | undefined>>
+}
+export const LockerContext = createContext<ILockerScreenContext>({
+  selectedLocker: undefined,
+  setSelectedLocker: () => {}
+});
 
 export default function Intro(): JSX.Element {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const Tab = createMaterialBottomTabNavigator<RootTabParamList>();
   const [rfToken, setRfToken] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
 
   const {
     status: authState,
@@ -65,31 +78,36 @@ export default function Intro(): JSX.Element {
     }
   }, [authState, isLoading, isSuccess, isError, authData]);
 
+  
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
-        {isLoggedIn ? (
-          <>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen
-              name="ClaimLocker"
-              component={ClaimLocker}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="ShareLocker"
-              component={ShareLocker}
-              options={{headerShown: false}}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Main" component={Main} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <LockerContext.Provider value={{selectedLocker, setSelectedLocker}}>
+      <NavigationContainer>
+        {
+          isLoggedIn ? (
+            <Tab.Navigator initialRouteName='Home'>
+              <Tab.Screen
+                name="Home"
+                component={Home}
+              />
+              <Tab.Screen
+                name="ClaimLocker"
+                component={ClaimLocker}
+              />
+              <Tab.Screen
+                name="ShareLocker"
+                component={ShareLocker}
+              />
+            </Tab.Navigator>
+          ) : (
+            <Stack.Navigator initialRouteName="Main">
+              <Stack.Screen name="Main" component={Main} options={{ headerShown: false }} />
+              <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+              <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+            </Stack.Navigator>
+          )
+        }
+      </NavigationContainer>
+    </LockerContext.Provider>
+
   );
 }

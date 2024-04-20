@@ -13,9 +13,9 @@ export default function ClaimLocker() {
 
   return (
     <Stack.Navigator initialRouteName="Main">
-      <Stack.Screen name="Main" component={MainCategory} />
-      <Stack.Screen name="Sub" component={SubCategory} />
-      <Stack.Screen name="Detail" component={DetailCategory} />
+      <Stack.Screen name="Main" component={MainCategory} options={{headerShown: false}}/>
+      <Stack.Screen name="Sub" component={SubCategory} options={{headerShown: false}}/>
+      <Stack.Screen name="Detail" component={DetailCategory} options={{headerShown: false}}/>
     </Stack.Navigator>
   );
 }

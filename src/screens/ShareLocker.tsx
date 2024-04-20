@@ -1,17 +1,18 @@
-import {RootStackScreenProps} from '@/navigation/types';
+import { LockerContext } from '@/Intro';
+import {RootTabScreenProps} from '@/navigation/types';
 import lockerAPI from '@/network/locker/api';
 import {ILocker} from '@/types/locker';
 import {useMutation} from '@tanstack/react-query';
 import {isAxiosError} from 'axios';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {Button, Divider, Text, TextInput} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 export default function ShareLocker(
-  props: RootStackScreenProps<'ShareLocker'>,
+  props: RootTabScreenProps<'ShareLocker'>,
 ): JSX.Element {
-  const selectedLocker = props.route.params;
+  const { selectedLocker } = useContext(LockerContext);
   const [sharedWith, setSharedWith] = useState('');
 
   const shareMutation = useMutation({
@@ -53,11 +54,15 @@ export default function ShareLocker(
   });
 
   const onButtonPressed = useCallback(() => {
+    if(typeof selectedLocker === 'undefined') return;
+
     shareMutation.mutate(selectedLocker);
   }, [shareMutation, selectedLocker]);
 
   const getSharedUserList = useCallback(() => {
-    return selectedLocker.sharedWith.map(e => {
+    if(typeof selectedLocker === 'undefined') return null;
+
+    return selectedLocker.sharedWith.map((e: any) => {
       return (
         <>
           <Text>{e.username}</Text>
@@ -85,28 +90,47 @@ export default function ShareLocker(
           <Text variant="titleLarge" style={{fontWeight: 'bold'}}>
             공유자 추가
           </Text>
-          <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함을 함께 공유할 수 있습니다.</Text>
-        </View>
-        <View
-          style={{
-            gap: 14,
-          }}>
-          <TextInput
-            placeholder="공유자 아이디를 입력하세요"
-            onChangeText={newText => setSharedWith(newText)}
-          />
-        </View>
-
-        <View>
-          <Button mode="contained-tonal" onPress={() => onButtonPressed()}>
-            등록
-          </Button>
+          {
+            typeof selectedLocker === 'undefined' ? (
+              <Text>보관함을 선택하세요.</Text>
+            ) : (
+              selectedLocker.owned ? (
+                  <View style={{
+                    gap: 16,
+                  }}>
+                    <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함을 함께 공유할 수 있습니다.</Text>
+                    <View
+                      style={{
+                        gap: 14,
+                      }}>
+                      <TextInput
+                        placeholder="공유자 아이디를 입력하세요"
+                        onChangeText={newText => setSharedWith(newText)}
+                      />
+                      <Button mode="contained-tonal" onPress={() => onButtonPressed()}>
+                        등록
+                      </Button>
+                    </View>
+                  </View>
+              ) : (
+                <Text variant="titleSmall">소유중인 보관함만 공유할 수 있습니다.</Text>
+              )
+              
+            )
+          }
+          
         </View>
 
         <Text variant="titleLarge" style={{fontWeight: 'bold'}}>
             공유자 목록
         </Text>
-        <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함의 공유 현황입니다.</Text>
+        {
+          typeof selectedLocker === 'undefined' ? (
+            <Text>보관함을 선택하세요.</Text>
+          ) : (
+            <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함의 공유 현황입니다.</Text>
+          )
+        }
         <View style={{
           gap: 14
         }}>

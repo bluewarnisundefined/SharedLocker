@@ -1,4 +1,5 @@
-import {RootStackScreenProps} from '@/navigation/types';
+import { LockerContext } from '@/Intro';
+import {RootTabScreenProps} from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
@@ -7,14 +8,14 @@ import {removeAllSecureToken} from '@/utils/keychain';
 import { mutationErrorHandler } from '@/utils/mutationHandler';
 import {useFocusEffect} from '@react-navigation/native';
 import {useMutation, useQuery} from '@tanstack/react-query';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {Alert, ScrollView, View} from 'react-native';
-import {Button, Card, Text} from 'react-native-paper';
+import {Appbar, Button, Card, Text} from 'react-native-paper';
 import DropDown from 'react-native-paper-dropdown';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 
-export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
+export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
   const {
     status: authStatus,
     data: authData,
@@ -85,7 +86,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   const [userLocker, setUserLocker] = useState<
     Map<string, ILockerWithUserInfo>
   >(new Map());
-  const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
+  const {selectedLocker, setSelectedLocker} = useContext(LockerContext);
   const [showDropDown, setShowDropDown] = useState(false);
   const [selLocker, setSelLocker] = useState<string>();
   const [selLockerDesc, setSelLockerDesc] = useState<string>('');
@@ -108,6 +109,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
     if (!combinedLocker || combinedLocker.length === 0) {
       setUserLocker(new Map());
+      setSelLockerDesc('');
       setSelLocker('');
       return;
     }
@@ -209,87 +211,70 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   }, [userLocker, selLocker]);
 
   return (
-    <ScrollView
-      style={{
-        padding: 16,
-      }}>
-      <Card
-        mode="contained"
+    <>
+      <Appbar.Header>
+        <Appbar.Content title="스마트 공유 보관함" />
+      </Appbar.Header>
+
+      <ScrollView
         style={{
-          padding: 8,
+          padding: 16,
         }}>
-        <Card.Title title="사용중인 보관함" />
-        <Card.Content>
-          <View
-            style={{
-              margin: 16,
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 8,
-            }}>
+        <Card
+          mode="contained"
+          style={{
+            padding: 8,
+          }}>
+          <Card.Title title="사용중인 보관함" />
+          <Card.Content>
+            <View
+              style={{
+                margin: 16,
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+              }}>
               {
-              generateQRCode() ? (
-                <QRCode
-                  value={generateQRCode()}
-                  logoBackgroundColor="transparent"
-                />
+                generateQRCode() ? (
+                  <QRCode
+                    value={generateQRCode()}
+                    logoBackgroundColor="transparent"
+                  />
                 ) : (
                   <Text>보관함을 선택하세요</Text>
                 )
               }
-          </View>
-          <View>
-            <DropDown
-              label={'보관함을 선택하세요'}
-              mode={'outlined'}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={selLocker}
-              setValue={setSelLocker}
-              list={getLockerList()}
-            />
-          </View>
-        </Card.Content>
-      </Card>
-      
-      <Button
-        mode="outlined"
-        onPress={() => {
-          props.navigation.navigate('ClaimLocker');
-        }}>
-        보관함 신청
-      </Button>
+            </View>
+            <View>
+              <DropDown
+                label={'보관함을 선택하세요'}
+                mode={'outlined'}
+                visible={showDropDown}
+                showDropDown={() => setShowDropDown(true)}
+                onDismiss={() => setShowDropDown(false)}
+                value={selLocker}
+                setValue={setSelLocker}
+                list={getLockerList()}
+              />
+            </View>
+          </Card.Content>
+        </Card>
 
-      {userLocker.size > 0 ? (
-        <>
-          <Button mode="outlined" onPress={() => { cancelLocker() }}>
-            보관함 취소
-          </Button>
-          <Button
-            mode="outlined"
-            onPress={() => {
-              if (!selectedLocker) {
-                Toast.show({
-                  type: 'warning',
-                  text1: '오류',
-                  text2: '보관함 정보가 없습니다.',
-                });
-                return;
-              }
-              props.navigation.navigate('ShareLocker', selectedLocker);
-            }}>
-            보관함 공유
-          </Button>
-        </>
-      ) : null}
-      <Button
-        mode="outlined"
-        onPress={() => {
-          authRefetch();
-        }}>
-        로그아웃
-      </Button>
-    </ScrollView>
+        {userLocker.size > 0 ? (
+          <>
+            <Button mode="outlined" onPress={() => { cancelLocker() }}>
+              보관함 취소
+            </Button>
+          </>
+        ) : null}
+        <Button
+          mode="outlined"
+          onPress={() => {
+            authRefetch();
+          }}>
+          로그아웃
+        </Button>
+      </ScrollView>
+    </>
   );
 }
