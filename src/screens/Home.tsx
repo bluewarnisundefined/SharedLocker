@@ -72,6 +72,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
           text2: '보관함 취소가 완료되었습니다.',
         });
         userLockerRefetch();
+        sharedLockerRefetch();
       }
     },
     onError: (error) => {
@@ -103,6 +104,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
       return locker !== undefined;
     });
     let lockerKey = '';
+    let lockerDesc = '';
 
     if (!combinedLocker || combinedLocker.length === 0) {
       setUserLocker(new Map());
@@ -112,10 +114,11 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
     if(!locker) {
       lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
+      lockerDesc = `${combinedLocker[0].building} ${combinedLocker[0].floorNumber}층 ${combinedLocker[0].lockerNumber}번`;
     }else{
       lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+      lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
     }
-    const lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
 
     setUserLocker(map => {
       const newMap = new Map(map);
@@ -188,7 +191,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
               building: selectedLocker.building,
               floorNumber: selectedLocker.floorNumber,
               lockerNumber: selectedLocker.lockerNumber,
-              isOwner: true,
+              isOwner: selectedLocker.owned,
             });
           },
         },
@@ -261,7 +264,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
       {userLocker.size > 0 ? (
         <>
           <Button mode="outlined" onPress={() => { cancelLocker() }}>
-            보관함 삭제 (아직 구현 안됨)
+            보관함 취소
           </Button>
           <Button
             mode="outlined"
