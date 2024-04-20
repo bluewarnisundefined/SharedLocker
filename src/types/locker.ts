@@ -7,6 +7,7 @@ export interface ILockerWithUserInfo {
   };
   sharedWith: {username: string}[];
   status: LockerStatus;
+  owned: boolean;
 }
 
 // 아래 LockerStatus enum은 SharedLocker-Server 의 Locker Schema에 정의된 status 필드의 enum과 동일하게 맞춰줘야 함

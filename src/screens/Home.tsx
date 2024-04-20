@@ -31,7 +31,10 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   );
 
   // 유저가 공유받은 보관함.
-  // TODO
+  const {data: sharedLockerData, refetch: sharedLockerRefetch} = useQuery(
+    ['sharedLocker'],
+    () => userAPI().sharedLocker(),
+  )
 
   // QR Key 요청
   const { data: qrKeyData } = useQuery(['qrKey'], () => authAPI().qrKey(), {
@@ -89,27 +92,42 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
   useFocusEffect(
     useCallback(() => {
       userLockerRefetch();
-    }, [userLockerRefetch]),
+      sharedLockerRefetch();
+    }, [userLockerRefetch, sharedLockerRefetch]),
   );
 
   useEffect(() => {
     const locker: ILockerWithUserInfo = userLockerData?.data.locker[0];
+    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData?.data.locker;
+    const combinedLocker = [...sharedLocker, locker].filter((locker) => {
+      return locker !== undefined;
+    });
+    let lockerKey = '';
 
-    if (!locker) {
+    if (!combinedLocker || combinedLocker.length === 0) {
       setUserLocker(new Map());
       setSelLocker('');
       return;
     }
 
-    const lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+    if(!locker) {
+      lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
+    }else{
+      lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
+    }
     const lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
 
     setUserLocker(map => {
-      return map.set(lockerKey, locker);
+      const newMap = new Map(map);
+
+      combinedLocker.forEach((locker) => {
+        newMap.set(`${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`, locker);
+      });
+      return newMap;
     });
     setSelLockerDesc(lockerDesc);
     setSelLocker(lockerKey);
-  }, [userLockerData]);
+  }, [userLockerData, sharedLockerData]);
 
   useEffect(() => {
     if (authStatus === 'success' && authData) {
@@ -129,7 +147,7 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
 
     userLocker.forEach((value, key) => {
       res.push({
-        label: `${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
+        label: `[${value.owned ? '소유' : '공유'}] ${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
         value: key,
       });
     });
@@ -231,36 +249,36 @@ export default function Home(props: RootStackScreenProps<'Home'>): JSX.Element {
           </View>
         </Card.Content>
       </Card>
-      {userLocker.size > 0 ? (
-        <Button mode="outlined" onPress={() => {cancelLocker()}}>
-          보관함 삭제 (아직 구현 안됨)
-        </Button>
-      ) : (
-        <Button
-          mode="outlined"
-          onPress={() => {
-            props.navigation.navigate('ClaimLocker');
-          }}>
-          보관함 신청
-        </Button>
-      )}
+      
+      <Button
+        mode="outlined"
+        onPress={() => {
+          props.navigation.navigate('ClaimLocker');
+        }}>
+        보관함 신청
+      </Button>
 
       {userLocker.size > 0 ? (
-        <Button
-          mode="outlined"
-          onPress={() => {
-            if (!selectedLocker) {
-              Toast.show({
-                type: 'warning',
-                text1: '오류',
-                text2: '보관함 정보가 없습니다.',
-              });
-              return;
-            }
-            props.navigation.navigate('ShareLocker', selectedLocker);
-          }}>
-          보관함 공유
-        </Button>
+        <>
+          <Button mode="outlined" onPress={() => { cancelLocker() }}>
+            보관함 삭제 (아직 구현 안됨)
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => {
+              if (!selectedLocker) {
+                Toast.show({
+                  type: 'warning',
+                  text1: '오류',
+                  text2: '보관함 정보가 없습니다.',
+                });
+                return;
+              }
+              props.navigation.navigate('ShareLocker', selectedLocker);
+            }}>
+            보관함 공유
+          </Button>
+        </>
       ) : null}
       <Button
         mode="outlined"
