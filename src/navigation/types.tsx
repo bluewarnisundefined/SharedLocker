@@ -10,7 +10,7 @@ export type RootStackParamList = {
 };
 
 export type RootTabParamList = {
-  Home: undefined;
+  Home: {refresh?: boolean};
   ClaimLocker: undefined;
   ShareLocker: ILockerWithUserInfo;
 };

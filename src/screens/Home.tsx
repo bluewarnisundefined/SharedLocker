@@ -16,6 +16,7 @@ import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 
 export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
+  const params = props.route.params;
   const {
     status: authStatus,
     data: authData,
@@ -93,9 +94,13 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
 
   useFocusEffect(
     useCallback(() => {
-      userLockerRefetch();
-      sharedLockerRefetch();
-    }, [userLockerRefetch, sharedLockerRefetch]),
+      if (typeof params === 'undefined') return;
+
+      if(params.refresh) {
+        userLockerRefetch();
+        sharedLockerRefetch();
+      }
+    }, [userLockerRefetch, sharedLockerRefetch, params]),
   );
 
   useEffect(() => {

@@ -39,7 +39,7 @@ export default function ShareLocker(
           text1: '성공',
           text2: data?.message,
         });
-        props.navigation.navigate('Home');
+        props.navigation.navigate('Home', {refresh: true});
       }
     },
     onError(error) {

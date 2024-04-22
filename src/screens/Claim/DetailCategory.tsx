@@ -40,7 +40,7 @@ export default function DetailCategory({
           type: 'success',
           text2: _data?.message,
         });
-        navigation.navigate('Home');
+        navigation.navigate('Home', {refresh: true});
       }
     },
     onError(error) {
@@ -68,7 +68,7 @@ export default function DetailCategory({
           type: 'success',
           text2: _data?.message,
         });
-        navigation.navigate('Home');
+        navigation.navigate('Home', {refresh: true});
       }
     },
     onError(error) {
