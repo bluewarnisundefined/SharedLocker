@@ -16,6 +16,14 @@ import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 
 export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
+  // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
+  const [userLocker, setUserLocker] = useState<
+    Map<string, ILockerWithUserInfo>
+  >(new Map());
+  const {selectedLocker, setSelectedLocker} = useContext(LockerContext);
+  const [showDropDown, setShowDropDown] = useState(false);
+  const [selLocker, setSelLocker] = useState<string>();
+  const [selLockerDesc, setSelLockerDesc] = useState<string>('');
   const params = props.route.params;
   const {
     status: authStatus,
@@ -39,18 +47,23 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
   )
 
   // QR Key 요청
-  const { data: qrKeyData } = useQuery(['qrKey'], () => authAPI().qrKey(), {
-    refetchInterval: (data, query) => {
-      if(!data || !data.data.success) return false;
+  const { data: qrKeyData } = useQuery(
+    ['qrKey'],
+    () => authAPI().qrKey(),
+    {
+      enabled: userLocker.size > 0,
+      refetchInterval: (data, query) => {
+        if (!data || !data.data.success) return false;
 
-      const _data = data.data;
+        const _data = data.data;
 
-      const currentTime = new Date().getTime();
-      const expiresIn = _data.qrKey.expiredAt - currentTime;
+        const currentTime = new Date().getTime();
+        const expiresIn = _data.qrKey.expiredAt - currentTime;
 
-      return expiresIn;
+        return expiresIn;
+      }
     }
-  });
+  );
 
   const cancelLockerMutation = useMutation({
     mutationFn: (data: {
@@ -81,16 +94,6 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
       mutationErrorHandler(error);
     }
   })
-
-
-  // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
-  const [userLocker, setUserLocker] = useState<
-    Map<string, ILockerWithUserInfo>
-  >(new Map());
-  const {selectedLocker, setSelectedLocker} = useContext(LockerContext);
-  const [showDropDown, setShowDropDown] = useState(false);
-  const [selLocker, setSelLocker] = useState<string>();
-  const [selLockerDesc, setSelLockerDesc] = useState<string>('');
 
   useFocusEffect(
     useCallback(() => {
