@@ -1,29 +1,32 @@
 import { LockerContext } from '@/Intro';
-import {RootTabScreenProps} from '@/navigation/types';
+import { RootTabScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
-import {ILockerWithUserInfo} from '@/types/locker';
-import {removeAllSecureToken} from '@/utils/keychain';
+import { ILockerWithUserInfo } from '@/types/locker';
+import { removeAllSecureToken } from '@/utils/keychain';
 import { mutationErrorHandler } from '@/utils/mutationHandler';
-import {useFocusEffect} from '@react-navigation/native';
-import {useMutation, useQuery} from '@tanstack/react-query';
-import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {Alert, ScrollView, View} from 'react-native';
-import {Appbar, Button, Card, Text} from 'react-native-paper';
-import DropDown from 'react-native-paper-dropdown';
+import { useFocusEffect } from '@react-navigation/native';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Alert, ScrollView, View } from 'react-native';
+import { Appbar, Button, Card, Text } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
+import { Dropdown } from 'react-native-element-dropdown';
+import { DropdownStyles } from '@/styles/dropdown';
 
 export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
   const [userLocker, setUserLocker] = useState<
     Map<string, ILockerWithUserInfo>
   >(new Map());
-  const {selectedLocker, setSelectedLocker} = useContext(LockerContext);
+  const { selectedLocker, setSelectedLocker } = useContext(LockerContext);
   const [showDropDown, setShowDropDown] = useState(false);
   const [selLocker, setSelLocker] = useState<string>();
   const [selLockerDesc, setSelLockerDesc] = useState<string>('');
+  const [dropdownPlaceholder, setDropdownPlaceholder] = 
+    useState<string>(userLocker.size > 0 ? '보관함 선택' : '보관함이 없습니다.');
   const params = props.route.params;
   const {
     status: authStatus,
@@ -35,13 +38,13 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
   });
 
   // 유저 소유 보관함.
-  const {data: userLockerData, refetch: userLockerRefetch} = useQuery(
+  const { data: userLockerData, refetch: userLockerRefetch } = useQuery(
     ['userLocker'],
     () => userAPI().locker(),
   );
 
   // 유저가 공유받은 보관함.
-  const {data: sharedLockerData, refetch: sharedLockerRefetch} = useQuery(
+  const { data: sharedLockerData, refetch: sharedLockerRefetch } = useQuery(
     ['sharedLocker'],
     () => userAPI().sharedLocker(),
   )
@@ -99,7 +102,7 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
     useCallback(() => {
       if (typeof params === 'undefined') return;
 
-      if(params.refresh) {
+      if (params.refresh) {
         userLockerRefetch();
         sharedLockerRefetch();
       }
@@ -122,10 +125,10 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
       return;
     }
 
-    if(!locker) {
+    if (!locker) {
       lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
       lockerDesc = `${combinedLocker[0].building} ${combinedLocker[0].floorNumber}층 ${combinedLocker[0].lockerNumber}번`;
-    }else{
+    } else {
       lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
       lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
     }
@@ -224,64 +227,68 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
         <Appbar.Content title="스마트 공유 보관함" />
       </Appbar.Header>
 
-      <ScrollView
-        style={{
-          padding: 16,
+      <ScrollView>
+        <View style={{
+          margin: 16,
+          gap: 16,
         }}>
-        <Card
-          mode="contained"
-          style={{
-            padding: 8,
-          }}>
-          <Card.Title title="사용중인 보관함" />
-          <Card.Content>
-            <View
-              style={{
-                margin: 16,
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 8,
-              }}>
-              {
-                generateQRCode() ? (
-                  <QRCode
-                    value={generateQRCode()}
-                    logoBackgroundColor="transparent"
-                  />
-                ) : (
-                  <Text>보관함을 선택하세요</Text>
-                )
-              }
-            </View>
-            <View>
-              <DropDown
-                label={'보관함을 선택하세요'}
-                mode={'outlined'}
-                visible={showDropDown}
-                showDropDown={() => setShowDropDown(true)}
-                onDismiss={() => setShowDropDown(false)}
-                value={selLocker}
-                setValue={setSelLocker}
-                list={getLockerList()}
-              />
-            </View>
-          </Card.Content>
-        </Card>
+          <Card
+            style={{
+              padding: 8,
+            }}>
+            <Card.Title title="사용중인 보관함" />
+            <Card.Content>
+              <View
+                style={{
+                  margin: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
+                {
+                  generateQRCode() ? (
+                    <QRCode
+                      value={generateQRCode()}
+                      logoBackgroundColor="transparent"
+                    />
+                  ) : null
+                }
+              </View>
+              <View>
+                <Dropdown
+                  style={DropdownStyles.dropdown}
+                  placeholderStyle={DropdownStyles.placeholderStyle}
+                  selectedTextStyle={DropdownStyles.selectedTextStyle}
+                  inputSearchStyle={DropdownStyles.inputSearchStyle}
+                  iconStyle={DropdownStyles.iconStyle}
+                  placeholder={dropdownPlaceholder}
+                  data={getLockerList()}
+                  labelField="label"
+                  valueField="value"
+                  value={selLocker}
+                  onChange={(item) => {
+                    setSelLocker(item.value);
+                  }}
+                />
+              </View>
+            </Card.Content>
+          </Card>
 
-        {userLocker.size > 0 ? (
-          <>
-            <Button mode="outlined" onPress={() => { cancelLocker() }}>
-              보관함 취소
-            </Button>
-          </>
-        ) : null}
-        <Button
-          mode="outlined"
-          onPress={() => {
-            authRefetch();
-          }}>
-          로그아웃
-        </Button>
+          {userLocker.size > 0 ? (
+            <>
+              <Button mode="outlined" onPress={() => { cancelLocker() }}>
+                보관함 취소
+              </Button>
+            </>
+          ) : null}
+          <Button
+            mode="outlined"
+            onPress={() => {
+              authRefetch();
+            }}>
+            로그아웃
+          </Button>
+        </View>
       </ScrollView>
     </>
   );
