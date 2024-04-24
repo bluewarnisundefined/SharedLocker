@@ -5,7 +5,7 @@ import {useQuery} from '@tanstack/react-query';
 import {RootStackParamList, RootTabParamList} from '@/navigation/types';
 import Home from './screens/Home';
 import ClaimLocker from './screens/Claim/ClaimLocker';
-import Main from './screens/Main';
+import Welcome from './screens/Welcome';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
@@ -99,8 +99,8 @@ export default function Intro(): JSX.Element {
               />
             </Tab.Navigator>
           ) : (
-            <Stack.Navigator initialRouteName="Main">
-              <Stack.Screen name="Main" component={Main} options={{ headerShown: false }} />
+            <Stack.Navigator initialRouteName="Welcome">
+              <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
               <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
               <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
             </Stack.Navigator>

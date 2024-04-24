@@ -4,7 +4,7 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 
 export type RootStackParamList = {
-  Main: undefined;
+  Welcome: undefined;
   Login: undefined;
   Register: undefined;
 };

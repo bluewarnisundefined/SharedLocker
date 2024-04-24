@@ -4,7 +4,7 @@ import {Button, Text} from 'react-native-paper';
 import {RootStackScreenProps} from '@/navigation/types';
 import {removeAllSecureToken} from '@/utils/keychain';
 
-export default function Main(props: RootStackScreenProps<'Main'>): JSX.Element {
+export default function Welcome(props: RootStackScreenProps<'Welcome'>): JSX.Element {
   return (
     <View
       style={{
