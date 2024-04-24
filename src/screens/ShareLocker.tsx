@@ -1,5 +1,5 @@
 import { LockerContext } from '@/Intro';
-import {RootTabScreenProps} from '@/navigation/types';
+import {HomeTabScreenProps} from '@/navigation/types';
 import lockerAPI from '@/network/locker/api';
 import {ILocker} from '@/types/locker';
 import {useMutation} from '@tanstack/react-query';
@@ -10,7 +10,7 @@ import {Button, Divider, Text, TextInput} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 export default function ShareLocker(
-  props: RootTabScreenProps<'ShareLocker'>,
+  props: HomeTabScreenProps<'ShareLocker'>,
 ): JSX.Element {
   const { selectedLocker } = useContext(LockerContext);
   const [sharedWith, setSharedWith] = useState('');
