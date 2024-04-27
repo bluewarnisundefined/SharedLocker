@@ -1,18 +1,16 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useQuery} from '@tanstack/react-query';
-import {RootStackParamList, RootTabParamList} from '@/navigation/types';
-import Home from './screens/Home';
-import ClaimLocker from './screens/Claim/ClaimLocker';
+import {HomeStackParamList, WelcomeStackParamList} from '@/navigation/types';
+import { HomeNavigator } from './screens/Home';
 import Welcome from './screens/Welcome';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import {getSecureToken, setSecureTokens} from '@/utils/keychain';
-import ShareLocker from './screens/ShareLocker';
-import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { ILockerWithUserInfo } from './types/locker';
+import HomeMenu from './screens/HomeMenu/HomeMenu';
+import { NavigationContainer } from '@react-navigation/native';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -24,8 +22,8 @@ export const LockerContext = createContext<ILockerScreenContext>({
 });
 
 export default function Intro(): JSX.Element {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-  const Tab = createMaterialBottomTabNavigator<RootTabParamList>();
+  const Stack = createNativeStackNavigator<WelcomeStackParamList>();
+  const HomeStack = createNativeStackNavigator<HomeStackParamList>();
   const [rfToken, setRfToken] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
@@ -80,24 +78,14 @@ export default function Intro(): JSX.Element {
 
   
   return (
-    <LockerContext.Provider value={{selectedLocker, setSelectedLocker}}>
+    <LockerContext.Provider value={{ selectedLocker, setSelectedLocker }}>
       <NavigationContainer>
         {
           isLoggedIn ? (
-            <Tab.Navigator initialRouteName='Home'>
-              <Tab.Screen
-                name="Home"
-                component={Home}
-              />
-              <Tab.Screen
-                name="ClaimLocker"
-                component={ClaimLocker}
-              />
-              <Tab.Screen
-                name="ShareLocker"
-                component={ShareLocker}
-              />
-            </Tab.Navigator>
+            <HomeStack.Navigator initialRouteName='HomeNavigator' >
+              <HomeStack.Screen name="HomeNavigator" component={HomeNavigator} options={{headerShown: false}}/>
+              <HomeStack.Screen name="HomeMenu" component={HomeMenu} options={{headerShown: false}} />
+            </HomeStack.Navigator>
           ) : (
             <Stack.Navigator initialRouteName="Welcome">
               <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
@@ -108,6 +96,5 @@ export default function Intro(): JSX.Element {
         }
       </NavigationContainer>
     </LockerContext.Provider>
-
   );
 }

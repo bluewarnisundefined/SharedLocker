@@ -1,5 +1,5 @@
 import { LockerContext } from '@/Intro';
-import { RootTabScreenProps } from '@/navigation/types';
+import { HomeTabParamList, HomeTabScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
@@ -10,13 +10,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
-import { Appbar, Button, Card, Text } from 'react-native-paper';
+import { Appbar, Button, Card, Divider, Menu } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 import { Dropdown } from 'react-native-element-dropdown';
 import { DropdownStyles } from '@/styles/dropdown';
+import ClaimLocker from './Claim/ClaimLocker';
+import ShareLocker from './ShareLocker';
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 
-export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
+export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
   const [userLocker, setUserLocker] = useState<
     Map<string, ILockerWithUserInfo>
@@ -221,10 +224,50 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
     setSelectedLocker(userLocker.get(selLocker));
   }, [userLocker, selLocker]);
 
+  const [visible, setVisible] = React.useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+
+  const beforeLogout = () => {
+    Alert.alert(
+      '로그아웃',
+      '로그아웃 하시겠습니까?',
+      [
+        {
+          text: '취소',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: () => {
+            authRefetch();
+          },
+        },
+      ],
+    )
+  }
+
+  
   return (
     <>
       <Appbar.Header>
         <Appbar.Content title="스마트 공유 보관함" />
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={
+            <Appbar.Action icon='dots-vertical' onPress={openMenu}/>
+          }
+          anchorPosition='bottom'
+        >
+          <Menu.Item onPress={() => {props.navigation.navigate('HomeMenu', {screen: 'Profile'})}} title="프로필" />
+          <Menu.Item onPress={() => {}} title="보관함 관리" />
+          <Divider />
+          <Menu.Item onPress={() => {beforeLogout()}} title="로그아웃" />
+        </Menu>
       </Appbar.Header>
 
       <ScrollView>
@@ -281,15 +324,21 @@ export default function Home(props: RootTabScreenProps<'Home'>): JSX.Element {
               </Button>
             </>
           ) : null}
-          <Button
-            mode="outlined"
-            onPress={() => {
-              authRefetch();
-            }}>
-            로그아웃
-          </Button>
         </View>
       </ScrollView>
     </>
   );
+}
+
+
+export function HomeNavigator(): JSX.Element {
+  const Tab = createMaterialBottomTabNavigator<HomeTabParamList>();
+
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="ClaimLocker" component={ClaimLocker} />
+      <Tab.Screen name="ShareLocker" component={ShareLocker} />
+    </Tab.Navigator>
+  )
 }
