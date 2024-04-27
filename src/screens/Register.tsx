@@ -1,4 +1,4 @@
-import { RootStackScreenProps } from '@/navigation/types';
+import { WelcomeStackScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import { mutationErrorHandler, mutationSuccessHandler } from '@/utils/mutationHandler';
 import { useMutation } from '@tanstack/react-query';
@@ -11,11 +11,12 @@ interface IFormInput {
   id: string;
   password: string;
   passwordCheck: string;
-  name: string;
+  nickname: string;
+  email: string;
   checkTerms: boolean;
 }
 export default function Register(
-  props: RootStackScreenProps<'Register'>,
+  props: WelcomeStackScreenProps<'Register'>,
 ): JSX.Element {
   const {
     control,
@@ -26,14 +27,16 @@ export default function Register(
       id: '',
       password: '',
       passwordCheck: '',
-      name: '',
+      nickname: '',
+      email: '',
       checkTerms: false,
     },
     mode: 'onChange',
   });
   const id = useWatch({ control, name: 'id' });
   const password = useWatch({ control, name: 'password' });
-  const name = useWatch({ control, name: 'name' });
+  const nickname = useWatch({ control, name: 'nickname' });
+  const email = useWatch({ control, name: 'email' });
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     mutation.mutate();
@@ -41,11 +44,11 @@ export default function Register(
 
   const mutation = useMutation({
     mutationFn: () => {
-      return authAPI().signUp(id, password, name);
+      return authAPI().signUp(id, password, nickname, email);
     },
     onSuccess: data => {
       mutationSuccessHandler(data)
-      props.navigation.navigate('Main');
+      props.navigation.navigate('Welcome');
     },
     onError: error => mutationErrorHandler
   });
@@ -97,10 +100,10 @@ export default function Register(
                 onChangeText={onChange}
               />
             )}
-            name="name"
+            name="nickname"
             rules={{ required: '이름을 입력하세요.' }}
           />
-          {errors.name && <HelperText type='error'>{errors.name.message}</HelperText>}
+          {errors.nickname && <HelperText type='error'>{errors.nickname.message}</HelperText>}
 
           <Controller
             control={control}
@@ -116,6 +119,20 @@ export default function Register(
             rules={{ required: '아이디를 입력하세요.' }}
           />
           {errors.id && <HelperText type='error'>{errors.id.message}</HelperText>}
+          <Controller
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                label={'이메일'}
+                placeholder="이메일"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
+            name="email"
+            rules={{ required: '이메일을 입력하세요.' }}
+          />
+          {errors.email && <HelperText type='error'>{errors.email.message}</HelperText>}
           <Controller
             control={control}
             render={({ field: { onChange, value } }) => (
