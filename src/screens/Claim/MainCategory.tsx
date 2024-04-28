@@ -1,15 +1,15 @@
 import {useCallback} from 'react';
 import Step from '@/components/Step';
-import {Button, Surface} from 'react-native-paper';
+import {Button, Surface, Text} from 'react-native-paper';
 import {ClaimStackScreenProps} from '@/navigation/types';
 import {useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import {IBuildings} from '@/types/locker';
+import { ILockerBuildingList } from '@/types/api/locker';
 
 export default function MainCategory({
   navigation,
 }: ClaimStackScreenProps<'Main'>) {
-  const {data} = useQuery(['buildings'], () => lockerAPI().buildings());
+  const {data} = useQuery<ILockerBuildingList>(['buildings'], () => lockerAPI().buildings());
 
   const onButtonPressed = useCallback(
     (selection: string) => {
@@ -23,9 +23,13 @@ export default function MainCategory({
       return [];
     }
 
-    const _data: IBuildings = data.data;
+    const value = data.data.value;
 
-    return _data.map(e => (
+    if (!value) {
+      return <Text>건물 목록이 없습니다.</Text>
+    }
+
+    return value.map(e => (
       <Button key={e} mode="contained" onPress={() => onButtonPressed(e)}>
         {e}
       </Button>

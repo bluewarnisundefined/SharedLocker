@@ -1,4 +1,4 @@
-import { LockerStatus } from "@/types/locker"
+import { LockerStatus } from "@/types/api/locker"
 
 export interface LockerStatusAttributes {
     status: LockerStatus,

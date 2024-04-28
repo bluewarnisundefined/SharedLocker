@@ -8,9 +8,10 @@ import Login from './screens/Login';
 import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import {getSecureToken, setSecureTokens} from '@/utils/keychain';
-import { ILockerWithUserInfo } from './types/locker';
 import HomeMenu from './screens/HomeMenu/HomeMenu';
 import { NavigationContainer } from '@react-navigation/native';
+import { IToken } from './types/api/auth';
+import { ILockerWithUserInfo } from './types/api/locker';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -34,7 +35,7 @@ export default function Intro(): JSX.Element {
     isLoading,
     isSuccess,
     isError,
-  } = useQuery(['auth'], () => authAPI().refreshToken(), {
+  } = useQuery<IToken>(['auth'], () => authAPI().refreshToken(), {
     // 캐시 유효기간을 4초로 설정하여 비슷한 시간에 여러번 요청되는 경우를 방지.
     staleTime: 1000 * 4,
     enabled: rfToken !== '',
@@ -53,11 +54,11 @@ export default function Intro(): JSX.Element {
     if (isSuccess && authData) {
       const _data = authData.data;
       const success = _data.success;
-      const token = _data.token;
-      const tokenExist = token ? true : false;
+      const token = _data.value;
+      const tokenExist = typeof token !== 'undefined' ? true : false;
 
-      const accessToken = tokenExist ? _data.token.accessToken : '';
-      const refreshToken = tokenExist ? _data.token.refreshToken : '';
+      const accessToken = tokenExist ? token!.accessToken : '';
+      const refreshToken = tokenExist ? token!.refreshToken : '';
 
       console.log(
         '[App] useQuery refresh Token authData.data: ',

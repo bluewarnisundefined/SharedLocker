@@ -1,13 +1,14 @@
 import {axiosInstance} from '../client';
+import { IUser, IUsersLocker, IUsersSharedLocker } from '@/types/api/user';
 
 const userAPI = () => ({
-  user: () => {
+  user: (): Promise<IUser> => {
     return axiosInstance.get('/api/user');
   },
-  locker: () => {
+  locker: (): Promise<IUsersLocker> => {
     return axiosInstance.get('/api/user/locker');
   },
-  sharedLocker: () => {
+  sharedLocker: (): Promise<IUsersSharedLocker> => {
     return axiosInstance.get('/api/user/sharedLocker');
   },
 });

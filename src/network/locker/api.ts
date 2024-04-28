@@ -1,15 +1,16 @@
+import { ILockerBuildingList, ILockerFloorList, ILocker, ILockerCancel, ILockerList, ILockerRequestShare, ILockerShare } from '@/types/api/locker';
 import {axiosInstance} from '../client';
 
 const lockerAPI = () => ({
-  buildings: () => {
+  buildings: (): Promise<ILockerBuildingList> => {
     return axiosInstance.get('/api/locker/building');
   },
-  floors: (buildingName: string) => {
+  floors: (buildingName: string): Promise<ILockerFloorList> => {
     return axiosInstance.get('/api/locker/floor', {
       params: {buildingName},
     });
   },
-  lockers: (buildingName: string, floor: number) => {
+  lockers: (buildingName: string, floor: number): Promise<ILockerList> => {
     return axiosInstance.get('/api/lockers', {
       params: {buildingName, floor},
     });
@@ -18,7 +19,7 @@ const lockerAPI = () => ({
     buildingName: string,
     floorNumber: number,
     lockerNumber: number,
-  ) => {
+  ): Promise<ILocker> => {
     return axiosInstance.post('/api/locker', {
       buildingName,
       floorNumber,
@@ -30,7 +31,7 @@ const lockerAPI = () => ({
     floorNumber: number,
     lockerNumber: number,
     sharedWith: string,
-  ) => {
+  ): Promise<ILockerShare> => {
     return axiosInstance.post('/api/locker/share', {
       buildingName: buildingName,
       floorNumber: floorNumber,
@@ -42,7 +43,7 @@ const lockerAPI = () => ({
     buildingName: string,
     floorNumber: number,
     lockerNumber: number,
-  ) => {
+  ): Promise<ILockerRequestShare> => {
     return axiosInstance.post('/api/locker/request-share', {
       buildingName,
       floorNumber,
@@ -54,7 +55,7 @@ const lockerAPI = () => ({
     floorNumber: number,
     lockerNumber: number,
     isOwner: boolean,
-  ) => {
+  ): Promise<ILockerCancel> => {
     return axiosInstance.delete('/api/locker/cancel', {
       data: {
         buildingName,

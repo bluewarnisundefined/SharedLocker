@@ -1,7 +1,8 @@
 import { LockerContext } from '@/Intro';
 import {HomeTabScreenProps} from '@/navigation/types';
 import lockerAPI from '@/network/locker/api';
-import {ILocker} from '@/types/locker';
+import { IServerErrorResponse } from '@/types/api';
+import { ILockerShare, ILockerWithUserInfo } from '@/types/api/locker';
 import {useMutation} from '@tanstack/react-query';
 import {isAxiosError} from 'axios';
 import React, {useCallback, useContext, useState} from 'react';
@@ -15,8 +16,8 @@ export default function ShareLocker(
   const { selectedLocker } = useContext(LockerContext);
   const [sharedWith, setSharedWith] = useState('');
 
-  const shareMutation = useMutation({
-    mutationFn: (locker: ILocker) => {
+  const shareMutation = useMutation<ILockerShare, IServerErrorResponse<string>, ILockerWithUserInfo>({
+    mutationFn: (locker) => {
       return lockerAPI().shareLocker(
         locker.building,
         locker.floorNumber,
@@ -42,14 +43,11 @@ export default function ShareLocker(
         props.navigation.navigate('Home', {refresh: true});
       }
     },
-    onError(error) {
-      if (isAxiosError(error)) {
-        console.log(error.toJSON());
-        Toast.show({
-          type: 'error',
-          text2: error.response?.data.message,
-        });
-      }
+    onError(error: IServerErrorResponse<string>) {
+      Toast.show({
+        type: 'error',
+        text2: error.response.data.message
+      });
     },
   });
 

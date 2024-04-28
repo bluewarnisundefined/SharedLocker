@@ -1,10 +1,10 @@
 import {useCallback} from 'react';
 import Step from '@/components/Step';
-import {Button} from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
 import {ClaimStackScreenProps} from '@/navigation/types';
 import {useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import {IFloors} from '@/types/locker';
+import { ILockerFloorList } from '@/types/api/locker';
 
 export default function SubCategory({
   route,
@@ -12,7 +12,7 @@ export default function SubCategory({
 }: ClaimStackScreenProps<'Sub'>) {
   const {buildingSelection} = route.params;
 
-  const {data} = useQuery(['buildings', buildingSelection], () =>
+  const {data} = useQuery<ILockerFloorList>(['buildings', buildingSelection], () =>
     lockerAPI().floors(buildingSelection),
   );
 
@@ -31,8 +31,9 @@ export default function SubCategory({
       return [];
     }
 
-    const _data: IFloors = data.data;
-    const sortedData = _data.sort((a, b) => a - b);
+    const value = data.data.value;
+    if(!value) return <Text>층 목록을 불러오지 못했습니다.</Text>;
+    const sortedData = value.sort((a, b) => a - b);
 
     return sortedData.map(e => (
       <Button

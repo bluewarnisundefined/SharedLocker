@@ -3,7 +3,6 @@ import { HomeTabParamList, HomeTabScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
 import lockerAPI from '@/network/locker/api';
 import userAPI from '@/network/user/api';
-import { ILockerWithUserInfo } from '@/types/locker';
 import { removeAllSecureToken } from '@/utils/keychain';
 import { mutationErrorHandler } from '@/utils/mutationHandler';
 import { useFocusEffect } from '@react-navigation/native';
@@ -18,6 +17,10 @@ import { DropdownStyles } from '@/styles/dropdown';
 import ClaimLocker from './Claim/ClaimLocker';
 import ShareLocker from './ShareLocker';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
+import { ILockerCancel, ILockerWithUserInfo } from '@/types/api/locker';
+import { IServerErrorResponse } from '@/types/api';
+import { IUsersLocker, IUsersSharedLocker } from '@/types/api/user';
+import { ILogout, IQrKey } from '@/types/api/auth';
 
 export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
@@ -35,43 +38,51 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
     status: authStatus,
     data: authData,
     refetch: authRefetch,
-  } = useQuery(['auth'], () => authAPI().signOut(), {
+  } = useQuery<ILogout>(['auth'], () => authAPI().signOut(), {
     enabled: false,
     retry: false,
   });
 
   // 유저 소유 보관함.
-  const { data: userLockerData, refetch: userLockerRefetch } = useQuery(
-    ['userLocker'],
-    () => userAPI().locker(),
+  const { data: userLockerData, refetch: userLockerRefetch } = 
+    useQuery<IUsersLocker>(
+      ['userLocker'],
+      () => userAPI().locker(),
   );
 
   // 유저가 공유받은 보관함.
-  const { data: sharedLockerData, refetch: sharedLockerRefetch } = useQuery(
+  const { data: sharedLockerData, refetch: sharedLockerRefetch } = useQuery<IUsersSharedLocker>(
     ['sharedLocker'],
     () => userAPI().sharedLocker(),
   )
 
   // QR Key 요청
-  const { data: qrKeyData } = useQuery(
+  const { data: qrKeyData } = useQuery<IQrKey>(
     ['qrKey'],
     () => authAPI().qrKey(),
     {
       enabled: userLocker.size > 0,
       refetchInterval: (data, query) => {
-        if (!data || !data.data.success) return false;
+        if (!data || !data.data.success || !data.data.value) return false;
 
-        const _data = data.data;
-
+        const value = data.data.value;
         const currentTime = new Date().getTime();
-        const expiresIn = _data.qrKey.expiredAt - currentTime;
+        const expiresIn = value.expiredAt - currentTime;
 
         return expiresIn;
       }
     }
   );
 
-  const cancelLockerMutation = useMutation({
+  interface ICancelLockerMutation {
+    building: string,
+    floorNumber: number,
+    lockerNumber: number,
+    isOwner: boolean,
+  }
+
+  const cancelLockerMutation = 
+    useMutation<ILockerCancel, IServerErrorResponse<string>, ICancelLockerMutation>({
     mutationFn: (data: {
       building: string,
       floorNumber: number,
@@ -113,9 +124,11 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   );
 
   useEffect(() => {
-    const locker: ILockerWithUserInfo = userLockerData?.data.locker[0];
-    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData?.data.locker || [];
-    const combinedLocker = [...sharedLocker, locker].filter((locker) => {
+    if(typeof userLockerData === 'undefined' || typeof sharedLockerData === 'undefined') return;
+    
+    const locker: ILockerWithUserInfo[] = userLockerData.data.value || [];
+    const sharedLocker: ILockerWithUserInfo[] = sharedLockerData.data.value || [];
+    const combinedLocker: ILockerWithUserInfo[] = [...sharedLocker, ...locker].filter((locker) => {
       return locker !== undefined;
     });
     let lockerKey = '';
@@ -128,12 +141,12 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
       return;
     }
 
-    if (!locker) {
+    if (typeof locker !== 'undefined' && locker.length === 0) {
       lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
       lockerDesc = `${combinedLocker[0].building} ${combinedLocker[0].floorNumber}층 ${combinedLocker[0].lockerNumber}번`;
     } else {
-      lockerKey = `${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`;
-      lockerDesc = `${locker.building} ${locker.floorNumber}층 ${locker.lockerNumber}번`;
+      lockerKey = `${locker[0].building}-${locker[0].floorNumber}-${locker[0].lockerNumber}`;
+      lockerDesc = `${locker[0].building} ${locker[0].floorNumber}층 ${locker[0].lockerNumber}번`;
     }
 
     setUserLocker(map => {
@@ -153,7 +166,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
       const _data = authData.data;
 
       if (_data && _data.success) {
-        const tokenExist = _data.token ? true : false;
+        const tokenExist = _data.value ? true : false;
         if (!tokenExist) {
           removeAllSecureToken();
         }
@@ -179,13 +192,13 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
       return;
     }
 
-    if (!qrKeyData || !qrKeyData.data.success) return;
+    if (!qrKeyData || !qrKeyData.data.success || !qrKeyData.data.value) return;
 
     const lockerInfo = `${selectedLocker?.building}-${selectedLocker?.floorNumber}-${selectedLocker?.lockerNumber}`;
 
     if (!lockerInfo) return;
 
-    return `${qrKeyData.data.qrKey.key}-${lockerInfo}`;
+    return `${qrKeyData.data.value.key}-${lockerInfo}`;
   }, [selectedLocker, qrKeyData]);
 
   const cancelLocker = useCallback(() => {

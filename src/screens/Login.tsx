@@ -1,5 +1,6 @@
-import { RootStackScreenProps } from '@/navigation/types';
+import { WelcomeStackScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
+import { ILogin } from '@/types/api/auth';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
@@ -11,7 +12,7 @@ interface IFormInput {
   password: string;
 }
 export default function Login(
-  props: RootStackScreenProps<'Login'>,
+  props: WelcomeStackScreenProps<'Login'>,
 ): JSX.Element {
   const {
     control,
@@ -29,7 +30,7 @@ export default function Login(
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => refetch();
 
-  const { refetch } = useQuery(['auth'], () => authAPI().signIn(id, password), {
+  const { refetch } = useQuery<ILogin>(['auth'], () => authAPI().signIn(id, password), {
     enabled: false,
     retry: false,
   });

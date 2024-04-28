@@ -1,18 +1,19 @@
+import { ILogin, ILogout, IQrKey, IRegister, IToken } from '@/types/api/auth';
 import {axiosInstance} from '../client';
 import {getSecureToken} from '@/utils/keychain';
 
 const authAPI = () => ({
-  signIn: (id: string, password: string) => {
+  signIn: (id: string, password: string): Promise<ILogin> => {
     return axiosInstance.post('/auth/login', {
       id,
       password,
     });
   },
-  signOut: () => {
+  signOut: (): Promise<ILogout> => {
     // Authorization 헤더는 요청 인터셉터에서 정의 됨.
     return axiosInstance.post('/auth/logout', {});
   },
-  signUp: (id: string, password: string, nickname: string, email: string) => {
+  signUp: (id: string, password: string, nickname: string, email: string): Promise<IRegister> => {
     return axiosInstance.post('/auth/register', {
       id,
       password,
@@ -20,7 +21,7 @@ const authAPI = () => ({
       email,
     });
   },
-  refreshToken: async () => {
+  refreshToken: async (): Promise<IToken> => {
     const token = await getSecureToken('refreshToken');
 
     if (!token) {
@@ -32,7 +33,7 @@ const authAPI = () => ({
       refresh_token: token,
     });
   },
-  qrKey: async () => {
+  qrKey: async (): Promise<IQrKey> => {
     return axiosInstance.get('/auth/qrkey');
   }
 });

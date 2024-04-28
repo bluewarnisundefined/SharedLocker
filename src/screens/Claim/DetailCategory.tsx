@@ -1,14 +1,14 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useRef} from 'react';
 import Step from '@/components/Step';
-import {Button, Chip} from 'react-native-paper';
+import {Button, Chip, Text} from 'react-native-paper';
 import {ClaimStackScreenProps} from '@/navigation/types';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import {ILocker, ILockerWithStatus, LockerStatus} from '@/types/locker';
 import {Alert, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {isAxiosError} from 'axios';
 import { LockerStatusAttrMapper, LockerStatusAttributes } from '@/utils/mapper';
+import { ILocker, ILockerList, ILockerRequestShare, LockerStatus } from '@/types/api/locker';
 
 export default function DetailCategory({
   route,
@@ -16,11 +16,11 @@ export default function DetailCategory({
 }: ClaimStackScreenProps<'Detail'>) {
   const {buildingSelection, floorSelection} = route.params;
   const floorRef = useRef<number>(0);
-  const {data} = useQuery(['lockers', buildingSelection, floorSelection], () =>
+  const {data} = useQuery<ILockerList>(['lockers', buildingSelection, floorSelection], () =>
     lockerAPI().lockers(buildingSelection, floorSelection),
   );
 
-  const claimMutation = useMutation({
+  const claimMutation = useMutation<ILocker>({
     mutationFn: () =>
       lockerAPI().claimLockers(
         buildingSelection,
@@ -29,7 +29,7 @@ export default function DetailCategory({
       ),
     onSuccess: claimData => {
       const _data = claimData.data;
-      const locker: ILocker = _data?.data.locker;
+      const locker = _data?.value;
 
       if (!locker) {
         return;
@@ -38,7 +38,7 @@ export default function DetailCategory({
       if (_data?.success) {
         Toast.show({
           type: 'success',
-          text2: _data?.message,
+          text2: `${buildingSelection} ${floorSelection}층 ${locker.lockerNumber}번 보관함을 신청하였습니다.`,
         });
         navigation.navigate('Home', {refresh: true});
       }
@@ -53,7 +53,7 @@ export default function DetailCategory({
     },
   });
 
-  const requestShareLocker = useMutation({
+  const requestShareLocker = useMutation<ILockerRequestShare>({
     mutationFn: () =>
       lockerAPI().requestShareLocker(
         buildingSelection,
@@ -83,15 +83,12 @@ export default function DetailCategory({
 
   const onLockerButtonPressed = useCallback(
     (floor: number, lockerAttr: LockerStatusAttributes) => {
-      let message = ''
-      let mutation = null;
+      let message = '';
       
       if (lockerAttr.status === LockerStatus.Share_Available) {
         message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 공유 신청할까요?`
-        mutation = requestShareLocker;
       } else if (lockerAttr.status === LockerStatus.Empty) {
         message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`
-        mutation = claimMutation;
       }
       Alert.alert(
         '보관함 신청',
@@ -105,9 +102,13 @@ export default function DetailCategory({
           {
             text: '신청',
             onPress: () => {
-              if(!mutation) return;
               floorRef.current = floor;
-              mutation.mutate();
+
+              if (lockerAttr.status === LockerStatus.Share_Available) {
+                requestShareLocker.mutate();
+              }else if (lockerAttr.status === LockerStatus.Empty) {
+                claimMutation.mutate();
+              }
             },
           },
         ],
@@ -121,8 +122,10 @@ export default function DetailCategory({
       return [];
     }
 
-    const _data: ILockerWithStatus[] = data.data;
-    const sortedData = _data.sort((a, b) => a.lockerNumber - b.lockerNumber);
+    const value = data.data.value;
+    if(!value) return <Text>보관함 목록을 불러오지 못했습니다.</Text>;
+
+    const sortedData = value.sort((a, b) => a.lockerNumber - b.lockerNumber);
 
     return sortedData.map(e => {
       const statusAttr = LockerStatusAttrMapper(e.status);

@@ -1,5 +1,6 @@
 import { WelcomeStackScreenProps } from '@/navigation/types';
 import authAPI from '@/network/auth/api';
+import { IRegister } from '@/types/api/auth';
 import { mutationErrorHandler, mutationSuccessHandler } from '@/utils/mutationHandler';
 import { useMutation } from '@tanstack/react-query';
 import React from 'react';
@@ -42,7 +43,7 @@ export default function Register(
     mutation.mutate();
   }
 
-  const mutation = useMutation({
+  const mutation = useMutation<IRegister>({
     mutationFn: () => {
       return authAPI().signUp(id, password, nickname, email);
     },
