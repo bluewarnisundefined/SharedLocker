@@ -50,7 +50,7 @@ export default function Register(
       mutationSuccessHandler(data)
       props.navigation.navigate('Welcome');
     },
-    onError: error => mutationErrorHandler
+    onError: error => mutationErrorHandler(error)
   });
 
   return (
