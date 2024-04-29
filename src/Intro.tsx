@@ -12,6 +12,7 @@ import HomeMenu from './screens/HomeMenu/HomeMenu';
 import { NavigationContainer } from '@react-navigation/native';
 import { IToken } from './types/api/auth';
 import { ILockerWithUserInfo } from './types/api/locker';
+import SplashScreen from 'react-native-splash-screen';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -76,6 +77,13 @@ export default function Intro(): JSX.Element {
       }
     }
   }, [authState, isLoading, isSuccess, isError, authData]);
+
+  useEffect(() => {
+    if (typeof isLoggedIn === 'undefined') {
+      return;
+    }
+    SplashScreen.hide();
+  }, [isLoggedIn, rfToken]);
 
   
   return (
