@@ -1,11 +1,11 @@
 import Layout from "@/components/Layout";
-import { HomeMenuStackScreenProps } from "@/navigation/types";
+import { SettingStackScreenProps } from "@/navigation/types";
 import userAPI from "@/network/user/api";
 import { IUser } from "@/types/api/user";
 import { useQuery } from "@tanstack/react-query";
 import { Text } from "react-native-paper";
 
-export function Profile(props: HomeMenuStackScreenProps<'Profile'>): JSX.Element {
+export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element {
   const {
     data: userData,
     isError

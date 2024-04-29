@@ -24,9 +24,16 @@ export type HomeTabParamList = {
 };
 
 export type MenuStackParamList = {
-  Profile: undefined;
-  Test: undefined;
+  SettingStack: {
+    screen: keyof SettingStackParamList;
+  };
 };
+
+export type SettingStackParamList = {
+  Settings: undefined;
+  Profile: undefined;
+  LockerManagement: undefined;
+}
 
 export type WelcomeStackScreenProps<T extends keyof WelcomeStackParamList> =
   NativeStackScreenProps<WelcomeStackParamList, T>;
@@ -44,6 +51,12 @@ export type HomeMenuStackScreenProps<T extends keyof MenuStackParamList> =
   CompositeScreenProps<
     BottomTabScreenProps<MenuStackParamList, T>,
     HomeStackScreenProps<keyof HomeStackParamList>
+  >
+
+export type SettingStackScreenProps<T extends keyof SettingStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<SettingStackParamList, T>,
+    HomeMenuStackScreenProps<keyof MenuStackParamList>
   >
 
 export type ClaimStackParamList = {

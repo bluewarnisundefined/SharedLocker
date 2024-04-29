@@ -243,26 +243,15 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
 
   const closeMenu = () => setVisible(false);
 
-  const beforeLogout = () => {
-    Alert.alert(
-      '로그아웃',
-      '로그아웃 하시겠습니까?',
-      [
-        {
-          text: '취소',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: '확인',
-          onPress: () => {
-            authRefetch();
-          },
-        },
-      ],
-    )
-  }
+  useEffect(() => {
+    const unsubscribeBlur = props.navigation.addListener('blur', () => {
+      closeMenu();
+    });
 
+    return () => {
+      unsubscribeBlur();
+    };
+  }, [props.navigation]);
   
   return (
     <>
@@ -276,10 +265,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
           }
           anchorPosition='bottom'
         >
-          <Menu.Item onPress={() => {props.navigation.navigate('HomeMenu', {screen: 'Profile'})}} title="프로필" />
-          <Menu.Item onPress={() => {}} title="보관함 관리" />
-          <Divider />
-          <Menu.Item onPress={() => {beforeLogout()}} title="로그아웃" />
+          <Menu.Item onPress={() => {props.navigation.navigate('HomeMenu', {screen: 'SettingStack'})}} title="설정" />
         </Menu>
       </Appbar.Header>
 

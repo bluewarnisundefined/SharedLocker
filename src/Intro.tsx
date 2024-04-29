@@ -8,7 +8,7 @@ import Login from './screens/Login';
 import Register from './screens/Register';
 import authAPI from '@/network/auth/api';
 import {getSecureToken, setSecureTokens} from '@/utils/keychain';
-import HomeMenu from './screens/HomeMenu/HomeMenu';
+import HomeMenu from './screens/Settings/HomeMenu';
 import { NavigationContainer } from '@react-navigation/native';
 import { IToken } from './types/api/auth';
 import { ILockerWithUserInfo } from './types/api/locker';
