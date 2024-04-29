@@ -13,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { IToken } from './types/api/auth';
 import { ILockerWithUserInfo } from './types/api/locker';
 import SplashScreen from 'react-native-splash-screen';
+import Toast from 'react-native-toast-message';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -27,7 +28,7 @@ export default function Intro(): JSX.Element {
   const Stack = createNativeStackNavigator<WelcomeStackParamList>();
   const HomeStack = createNativeStackNavigator<HomeStackParamList>();
   const [rfToken, setRfToken] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>();
   const [selectedLocker, setSelectedLocker] = useState<ILockerWithUserInfo>();
 
   const {
@@ -47,11 +48,23 @@ export default function Intro(): JSX.Element {
     getSecureToken('refreshToken').then(res => {
       if (res) {
         setRfToken(res);
+      } else{
+        // 토큰 없음
+        setIsLoggedIn(false);
       }
     });
   }, []);
 
   useEffect(() => {
+    if (isError) {
+      Toast.show({
+        type: 'error',
+        text1: '오류가 발생했어요',
+        text2: '잠시 후 다시 시도해주세요.',
+      });
+      
+      setIsLoggedIn(false);
+    }
     if (isSuccess && authData) {
       const _data = authData.data;
       const success = _data.success;
