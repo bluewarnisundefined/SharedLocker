@@ -335,9 +335,18 @@ export function HomeNavigator(): JSX.Element {
 
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="ClaimLocker" component={ClaimLocker} />
-      <Tab.Screen name="ShareLocker" component={ShareLocker} />
+      <Tab.Screen name="Home" component={Home} options={{
+        tabBarLabel: '홈',
+        tabBarIcon: 'home',
+      }} />
+      <Tab.Screen name="ClaimLocker" component={ClaimLocker} options={{
+        tabBarLabel: '신청',
+        tabBarIcon: 'plus',
+      }}/>
+      <Tab.Screen name="ShareLocker" component={ShareLocker} options={{
+        tabBarLabel: '공유',
+        tabBarIcon: 'share-variant',
+      }}/>
     </Tab.Navigator>
   )
 }
