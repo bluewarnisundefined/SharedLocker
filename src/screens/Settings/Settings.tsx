@@ -34,8 +34,7 @@ export default function Settings(props: SettingStackScreenProps<'Settings'>) {
       ],
     )
   }
-
-  props.navigation.navigate('Settings')
+  
   return (
     <>
       <Appbar.Header>
