@@ -15,6 +15,7 @@ export interface ILockerWithUserInfo {
         nickname: string;
     };
     sharedWith: { nickname: string }[];
+    shareRequested: { nickname: string }[];
     status: LockerStatus;
     owned: boolean;
 }

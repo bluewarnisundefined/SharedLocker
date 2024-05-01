@@ -9,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
-import { Appbar, Button, Card, Divider, Menu } from 'react-native-paper';
+import { Appbar, Button, Card, Divider, Menu, Text } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from 'react-native-toast-message';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -323,6 +323,30 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
               </Button>
             </>
           ) : null}
+
+          {
+            selectedLocker?.owned ? (
+              <>
+                <Divider />
+
+                <Text variant='bodyLarge'>
+                  공유 요청 목록
+                </Text>
+                <View>
+                  {
+                    selectedLocker.shareRequested.map((user, index) => {
+                      return (
+                        <Text key={index}>
+                          {user.nickname}
+                        </Text>
+                      )
+                    })
+                  }
+                </View>
+              </>
+            ) : null
+          }
+
         </View>
       </ScrollView>
     </>
