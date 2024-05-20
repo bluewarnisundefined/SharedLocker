@@ -40,7 +40,9 @@ axiosInstance.interceptors.response.use(
   async error => {
     const { config, response: { status } } = error;
 
-    if (config.url === '/auth/token' && status !== 401 || config.sent) {
+    const ignore = ['/auth/token', '/auth/login', '/auth/register'];
+
+    if (ignore.includes(config.url) && status !== 401 || config.sent) {
       return Promise.reject(error);
     }
 
