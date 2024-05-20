@@ -21,6 +21,7 @@ import { ILockerCancel, ILockerWithUserInfo } from '@/types/api/locker';
 import { IServerErrorResponse } from '@/types/api';
 import { IUsersLocker, IUsersSharedLocker } from '@/types/api/user';
 import { ILogout, IQrKey } from '@/types/api/auth';
+import RequestList from '@/components/RequestList';
 
 export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
@@ -75,7 +76,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   );
 
   interface ICancelLockerMutation {
-    building: string,
+    buildingName: string,
     floorNumber: number,
     lockerNumber: number,
     isOwner: boolean,
@@ -84,13 +85,13 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   const cancelLockerMutation = 
     useMutation<ILockerCancel, IServerErrorResponse<string>, ICancelLockerMutation>({
     mutationFn: (data: {
-      building: string,
+      buildingName: string,
       floorNumber: number,
       lockerNumber: number,
       isOwner: boolean,
     }) => {
       return lockerAPI().cancelLocker(
-        data.building,
+        data.buildingName,
         data.floorNumber,
         data.lockerNumber,
         data.isOwner,
@@ -192,6 +193,8 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
       return;
     }
 
+    console.log('generateQRCode selectedLocker: ', selectedLocker);
+
     if (!qrKeyData || !qrKeyData.data.success || !qrKeyData.data.value) return;
 
     const lockerInfo = `${selectedLocker?.buildingNumber} ${selectedLocker?.floorNumber} ${selectedLocker?.lockerNumber}`;
@@ -217,7 +220,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
           text: '확인',
           onPress: () => {
             cancelLockerMutation.mutate({
-              building: selectedLocker.buildingName,
+              buildingName: selectedLocker.buildingName,
               floorNumber: selectedLocker.floorNumber,
               lockerNumber: selectedLocker.lockerNumber,
               isOwner: selectedLocker.owned,
@@ -332,17 +335,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
                 <Text variant='bodyLarge'>
                   공유 요청 목록
                 </Text>
-                <View>
-                  {
-                    selectedLocker.shareRequested.map((user, index) => {
-                      return (
-                        <Text key={index}>
-                          {user.nickname}
-                        </Text>
-                      )
-                    })
-                  }
-                </View>
+                <RequestList locker={selectedLocker}/>
               </>
             ) : null
           }

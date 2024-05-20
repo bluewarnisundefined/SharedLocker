@@ -1,4 +1,5 @@
 import { IServerInfoResponse } from ".";
+import { User } from "./user";
 
 export enum LockerStatus {
     Empty = 'Empty',
@@ -12,11 +13,9 @@ export interface ILockerWithUserInfo {
     buildingName: string;
     floorNumber: number;
     lockerNumber: number;
-    claimedBy: {
-        nickname: string;
-    };
-    sharedWith: { nickname: string }[];
-    shareRequested: { nickname: string }[];
+    claimedByUser: User;
+    sharedWithUsers: User[];
+    shareRequestedUsers: User[];
     status: LockerStatus;
     owned: boolean;
 }

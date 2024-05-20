@@ -19,7 +19,7 @@ export default function ShareLocker(
   const shareMutation = useMutation<ILockerShare, IServerErrorResponse<string>, ILockerWithUserInfo>({
     mutationFn: (locker) => {
       return lockerAPI().shareLocker(
-        locker.building,
+        locker.buildingName,
         locker.floorNumber,
         locker.lockerNumber,
         sharedWith,
@@ -60,12 +60,12 @@ export default function ShareLocker(
   const getSharedUserList = useCallback(() => {
     if(typeof selectedLocker === 'undefined') return null;
 
-    return selectedLocker.sharedWith.map((e: any) => {
+    return selectedLocker.sharedWithUsers.map((user) => {
       return (
-        <>
-          <Text>{e.username}</Text>
+        <View key={user.userId}>
+          <Text>{`${user.nickname} (${user.userId})`}</Text>
           <Divider />
-        </>
+        </View>
       )
     });
   }, [selectedLocker]);
@@ -96,7 +96,7 @@ export default function ShareLocker(
                   <View style={{
                     gap: 16,
                   }}>
-                    <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함을 함께 공유할 수 있습니다.</Text>
+                    <Text variant="titleSmall">{selectedLocker.buildingName} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함을 함께 공유할 수 있습니다.</Text>
                     <View
                       style={{
                         gap: 14,
@@ -126,7 +126,7 @@ export default function ShareLocker(
           typeof selectedLocker === 'undefined' ? (
             <Text>보관함을 선택하세요.</Text>
           ) : (
-            <Text variant="titleSmall">{selectedLocker.building} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함의 공유 현황입니다.</Text>
+            <Text variant="titleSmall">{selectedLocker.buildingName} {selectedLocker.floorNumber}층 {selectedLocker.lockerNumber}번 보관함의 공유 현황입니다.</Text>
           )
         }
         <View style={{
