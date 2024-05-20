@@ -8,7 +8,8 @@ export enum LockerStatus {
 }
 
 export interface ILockerWithUserInfo {
-    building: string;
+    buildingNumber: number
+    buildingName: string;
     floorNumber: number;
     lockerNumber: number;
     claimedBy: {

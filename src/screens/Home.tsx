@@ -142,18 +142,18 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
     }
 
     if (typeof locker !== 'undefined' && locker.length === 0) {
-      lockerKey = `${combinedLocker[0].building}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
-      lockerDesc = `${combinedLocker[0].building} ${combinedLocker[0].floorNumber}층 ${combinedLocker[0].lockerNumber}번`;
+      lockerKey = `${combinedLocker[0].buildingName}-${combinedLocker[0].floorNumber}-${combinedLocker[0].lockerNumber}`;
+      lockerDesc = `${combinedLocker[0].buildingName} ${combinedLocker[0].floorNumber}층 ${combinedLocker[0].lockerNumber}번`;
     } else {
-      lockerKey = `${locker[0].building}-${locker[0].floorNumber}-${locker[0].lockerNumber}`;
-      lockerDesc = `${locker[0].building} ${locker[0].floorNumber}층 ${locker[0].lockerNumber}번`;
+      lockerKey = `${locker[0].buildingName}-${locker[0].floorNumber}-${locker[0].lockerNumber}`;
+      lockerDesc = `${locker[0].buildingName} ${locker[0].floorNumber}층 ${locker[0].lockerNumber}번`;
     }
 
     setUserLocker(map => {
       const newMap = new Map(map);
 
       combinedLocker.forEach((locker) => {
-        newMap.set(`${locker.building}-${locker.floorNumber}-${locker.lockerNumber}`, locker);
+        newMap.set(`${locker.buildingName}-${locker.floorNumber}-${locker.lockerNumber}`, locker);
       });
       return newMap;
     });
@@ -179,7 +179,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
 
     userLocker.forEach((value, key) => {
       res.push({
-        label: `[${value.owned ? '소유' : '공유'}] ${value.building} ${value.floorNumber}층 ${value.lockerNumber}번`,
+        label: `[${value.owned ? '소유' : '공유'}] ${value.buildingName} ${value.floorNumber}층 ${value.lockerNumber}번`,
         value: key,
       });
     });
@@ -194,11 +194,11 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
 
     if (!qrKeyData || !qrKeyData.data.success || !qrKeyData.data.value) return;
 
-    const lockerInfo = `${selectedLocker?.building}-${selectedLocker?.floorNumber}-${selectedLocker?.lockerNumber}`;
+    const lockerInfo = `${selectedLocker?.buildingNumber} ${selectedLocker?.floorNumber} ${selectedLocker?.lockerNumber}`;
 
     if (!lockerInfo) return;
 
-    return `${qrKeyData.data.value.key}-${lockerInfo}`;
+    return `${qrKeyData.data.value.key} ${lockerInfo}`;
   }, [selectedLocker, qrKeyData]);
 
   const cancelLocker = useCallback(() => {
@@ -217,7 +217,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
           text: '확인',
           onPress: () => {
             cancelLockerMutation.mutate({
-              building: selectedLocker.building,
+              building: selectedLocker.buildingName,
               floorNumber: selectedLocker.floorNumber,
               lockerNumber: selectedLocker.lockerNumber,
               isOwner: selectedLocker.owned,
