@@ -131,11 +131,13 @@ export default function DetailCategory({
       const statusAttr = LockerStatusAttrMapper(e.status);
 
       return (
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 10,
+        <View 
+          key={e.lockerNumber}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
         }}>
           <Button
             key={e.lockerNumber}
