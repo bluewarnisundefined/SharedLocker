@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {API_BASE_URL} from '@env';
-import { getSecureToken } from '@/utils/keychain';
+import { getSecureToken, setSecureToken } from '@/utils/keychain';
+import authAPI from './auth/api';
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -31,3 +32,30 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+axiosInstance.interceptors.response.use(
+  response => {
+    return response;
+  },
+  async error => {
+    const { config, response: { status } } = error;
+
+    if (config.url === '/auth/token' && status !== 401 || config.sent) {
+      return Promise.reject(error);
+    }
+
+    config.sent = true;
+    const token = await authAPI().refreshToken();
+    
+    const accessToken = token.data.value?.accessToken;
+    const refreshToken = token.data.value?.refreshToken;
+
+    if (accessToken && refreshToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+
+      setSecureToken(accessToken, 'accessToken');
+      setSecureToken(refreshToken, 'refreshToken');
+    }
+    return axiosInstance(config);
+  }
+)
