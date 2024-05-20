@@ -14,6 +14,8 @@ import { IToken } from './types/api/auth';
 import { ILockerWithUserInfo } from './types/api/locker';
 import SplashScreen from 'react-native-splash-screen';
 import Toast from 'react-native-toast-message';
+import userAPI from './network/user/api';
+import { IUser } from './types/api/user';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -42,6 +44,13 @@ export default function Intro(): JSX.Element {
     staleTime: 1000 * 4,
     enabled: rfToken !== '',
     retry: false,
+  });
+
+  const {
+    data: userData,
+    isError: userIsError
+  } = useQuery<IUser>(['user'], () => userAPI().user(), {
+    enabled: isLoggedIn,
   });
 
   useEffect(() => {
@@ -83,9 +92,9 @@ export default function Intro(): JSX.Element {
         setIsLoggedIn(false);
       }
       if (success && tokenExist) {
-        setIsLoggedIn(true);
         setSecureTokens(accessToken, refreshToken).then(() => {
           console.log('[Intro] 토큰이 KeyChain 에 저장되었습니다.');
+          setIsLoggedIn(true);
         });
       }
     }

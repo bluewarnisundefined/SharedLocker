@@ -19,9 +19,10 @@ import ShareLocker from './ShareLocker';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { ILockerCancel, ILockerWithUserInfo } from '@/types/api/locker';
 import { IServerErrorResponse } from '@/types/api';
-import { IUsersLocker, IUsersSharedLocker } from '@/types/api/user';
+import { IUser, IUsersLocker, IUsersSharedLocker } from '@/types/api/user';
 import { ILogout, IQrKey } from '@/types/api/auth';
 import RequestList from '@/components/RequestList';
+import Admin from './Admin';
 
 export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   // 유저가 이용할 수 있는 보관함의 전체 목록입니다. 소유 보관함과 공유 보관함을 모두 포함합니다.
@@ -349,6 +350,12 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
 
 export function HomeNavigator(): JSX.Element {
   const Tab = createMaterialBottomTabNavigator<HomeTabParamList>();
+  const {
+    data: userData,
+    isError: userIsError
+  } = useQuery<IUser>(['user'], () => userAPI().user());
+
+  const isAdmin = Array.isArray(userData?.data?.message.admin) && userData?.data?.message.admin.length > 0;
 
   return (
     <Tab.Navigator>
@@ -364,6 +371,14 @@ export function HomeNavigator(): JSX.Element {
         tabBarLabel: '공유',
         tabBarIcon: 'share-variant',
       }}/>
+      {
+        isAdmin && (
+          <Tab.Screen name="Admin" component={Admin} options={{
+            tabBarLabel: '관리자',
+            tabBarIcon: 'shield-account',
+          }}/>
+        )
+      }
     </Tab.Navigator>
   )
 }

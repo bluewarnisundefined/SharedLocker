@@ -22,6 +22,11 @@ export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element 
               <Text>이름: {userData?.data?.message.nickname}</Text>
               <Text>이메일: {userData?.data?.message.email}</Text>
               <Text>등록일: {userData?.data?.message.createdAt}</Text>
+              {
+                userData?.data?.message.admin && (
+                  <Text>관리자 권한: {userData?.data?.message.admin[0].role}</Text>
+                )
+              }
             </>
           )
       }

@@ -21,6 +21,7 @@ export type HomeTabParamList = {
   Home: {refresh?: boolean};
   ClaimLocker: undefined;
   ShareLocker: ILockerWithUserInfo;
+  Admin: undefined;
 };
 
 export type MenuStackParamList = {
