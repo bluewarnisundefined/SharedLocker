@@ -11,6 +11,9 @@ export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element 
     isError
   } = useQuery<IUser>(['user'], () => userAPI().user());
 
+  const admins = userData?.data?.message.admin;
+  const admin_role_available = Array.isArray(admins) && admins.length > 0;
+
   return (
     <Layout>
       <Text>회원 등록 정보</Text>
@@ -23,8 +26,8 @@ export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element 
               <Text>이메일: {userData?.data?.message.email}</Text>
               <Text>등록일: {userData?.data?.message.createdAt}</Text>
               {
-                userData?.data?.message.admin && (
-                  <Text>관리자 권한: {userData?.data?.message.admin[0].role}</Text>
+                admin_role_available && (
+                  <Text>관리자 권한: {admins[0].role}</Text>
                 )
               }
             </>
