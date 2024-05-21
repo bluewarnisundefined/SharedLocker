@@ -19,7 +19,7 @@ export default function ShareLocker(
   const shareMutation = useMutation<ILockerShare, IServerErrorResponse<string>, ILockerWithUserInfo>({
     mutationFn: (locker) => {
       return lockerAPI().shareLocker(
-        locker.buildingName,
+        locker.buildingNumber,
         locker.floorNumber,
         locker.lockerNumber,
         sharedWith,

@@ -21,7 +21,11 @@ export interface ILockerWithUserInfo {
 }
 
 // 보관함 신청 관련 배열 타입
-export type Buildings = string[];
+export type Building = {
+    buildingName: string;
+    buildingNumber: number;
+}
+export type Buildings = Building[];
 export type Floors = number[];
 export interface LockerWithStatus {
   lockerNumber: number;

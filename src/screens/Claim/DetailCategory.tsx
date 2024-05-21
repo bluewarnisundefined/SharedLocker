@@ -17,13 +17,13 @@ export default function DetailCategory({
   const {buildingSelection, floorSelection} = route.params;
   const floorRef = useRef<number>(0);
   const {data} = useQuery<ILockerList>(['lockers', buildingSelection, floorSelection], () =>
-    lockerAPI().lockers(buildingSelection, floorSelection),
+    lockerAPI().lockers(buildingSelection.buildingNumber, floorSelection),
   );
 
   const claimMutation = useMutation<ILocker>({
     mutationFn: () =>
       lockerAPI().claimLockers(
-        buildingSelection,
+        buildingSelection.buildingNumber,
         floorSelection,
         floorRef.current,
       ),
@@ -56,7 +56,7 @@ export default function DetailCategory({
   const requestShareLocker = useMutation<ILockerRequestShare>({
     mutationFn: () =>
       lockerAPI().requestShareLocker(
-        buildingSelection,
+        buildingSelection.buildingNumber,
         floorSelection,
         floorRef.current,
       ),
@@ -86,9 +86,9 @@ export default function DetailCategory({
       let message = '';
       
       if (lockerAttr.status === LockerStatus.Share_Available) {
-        message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 공유 신청할까요?`
+        message = `${buildingSelection.buildingName} ${floorSelection}층 ${floor}번 보관함을 공유 신청할까요?`
       } else if (lockerAttr.status === LockerStatus.Empty) {
-        message = `${buildingSelection} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`
+        message = `${buildingSelection.buildingName} ${floorSelection}층 ${floor}번 보관함을 신청할까요?`
       }
       Alert.alert(
         '보관함 신청',

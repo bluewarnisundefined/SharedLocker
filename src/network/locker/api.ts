@@ -5,60 +5,60 @@ const lockerAPI = () => ({
   buildings: (): Promise<ILockerBuildingList> => {
     return axiosInstance.get('/api/locker/building');
   },
-  floors: (buildingName: string): Promise<ILockerFloorList> => {
+  floors: (buildingNumber: number): Promise<ILockerFloorList> => {
     return axiosInstance.get('/api/locker/floor', {
-      params: {buildingName},
+      params: {buildingNumber},
     });
   },
-  lockers: (buildingName: string, floor: number): Promise<ILockerList> => {
+  lockers: (buildingNumber: number, floor: number): Promise<ILockerList> => {
     return axiosInstance.get('/api/lockers', {
-      params: {buildingName, floor},
+      params: {buildingNumber, floor},
     });
   },
   claimLockers: (
-    buildingName: string,
+    buildingNumber: number,
     floorNumber: number,
     lockerNumber: number,
   ): Promise<ILocker> => {
     return axiosInstance.post('/api/locker', {
-      buildingName,
+      buildingNumber,
       floorNumber,
       lockerNumber,
     });
   },
   shareLocker: (
-    buildingName: string,
+    buildingNumber: number,
     floorNumber: number,
     lockerNumber: number,
     sharedWith: string,
   ): Promise<ILockerShare> => {
     return axiosInstance.post('/api/locker/share', {
-      buildingName: buildingName,
+      buildingNumber: buildingNumber,
       floorNumber: floorNumber,
       lockerNumber: lockerNumber,
       sharedWith: sharedWith,
     });
   },
   requestShareLocker: (
-    buildingName: string,
+    buildingNumber: number,
     floorNumber: number,
     lockerNumber: number,
   ): Promise<ILockerRequestShare> => {
     return axiosInstance.post('/api/locker/request-share', {
-      buildingName,
+      buildingNumber,
       floorNumber,
       lockerNumber,
     });
   },
   cancelLocker: (
-    buildingName: string,
+    buildingNumber: number,
     floorNumber: number,
     lockerNumber: number,
     isOwner: boolean,
   ): Promise<ILockerCancel> => {
     return axiosInstance.delete('/api/locker/cancel', {
       data: {
-        buildingName,
+        buildingNumber,
         floorNumber,
         lockerNumber,
         isOwner

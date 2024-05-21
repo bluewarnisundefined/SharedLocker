@@ -4,7 +4,7 @@ import {Button, Surface, Text} from 'react-native-paper';
 import {ClaimStackScreenProps} from '@/navigation/types';
 import {useQuery} from '@tanstack/react-query';
 import lockerAPI from '@/network/locker/api';
-import { ILockerBuildingList } from '@/types/api/locker';
+import { Building, ILockerBuildingList } from '@/types/api/locker';
 
 export default function MainCategory({
   navigation,
@@ -12,8 +12,8 @@ export default function MainCategory({
   const {data} = useQuery<ILockerBuildingList>(['buildings'], () => lockerAPI().buildings());
 
   const onButtonPressed = useCallback(
-    (selection: string) => {
-      navigation.navigate('Sub', {buildingSelection: selection});
+    (buildingSelection: Building) => {
+      navigation.navigate('Sub', { buildingSelection });
     },
     [navigation],
   );
@@ -30,8 +30,8 @@ export default function MainCategory({
     }
 
     return value.map(e => (
-      <Button key={e} mode="contained" onPress={() => onButtonPressed(e)}>
-        {e}
+      <Button key={e.buildingNumber} mode="contained" onPress={() => onButtonPressed(e)}>
+        {e.buildingName}
       </Button>
     ));
   }, [data, onButtonPressed]);

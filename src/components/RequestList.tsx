@@ -17,7 +17,7 @@ export default function RequestList(props: {
     const shareMutation = useMutation<ILockerShare, IServerErrorResponse<string>, string>({
         mutationFn: (sharedWith) => {
             return lockerAPI().shareLocker(
-                props.locker.buildingName,
+                props.locker.buildingNumber,
                 props.locker.floorNumber,
                 props.locker.lockerNumber,
                 sharedWith,

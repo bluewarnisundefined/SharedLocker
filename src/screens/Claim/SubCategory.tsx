@@ -12,8 +12,8 @@ export default function SubCategory({
 }: ClaimStackScreenProps<'Sub'>) {
   const {buildingSelection} = route.params;
 
-  const {data} = useQuery<ILockerFloorList>(['buildings', buildingSelection], () =>
-    lockerAPI().floors(buildingSelection),
+  const {data} = useQuery<ILockerFloorList>(['buildings', buildingSelection.buildingNumber], () =>
+    lockerAPI().floors(buildingSelection.buildingNumber),
   );
 
   const onButtonPressed = useCallback(

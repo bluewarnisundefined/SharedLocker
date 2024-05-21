@@ -1,4 +1,4 @@
-import { ILockerWithUserInfo } from '@/types/api/locker';
+import { Building, ILockerWithUserInfo } from '@/types/api/locker';
 import {CompositeScreenProps} from '@react-navigation/native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
@@ -62,9 +62,9 @@ export type SettingStackScreenProps<T extends keyof SettingStackParamList> =
 
 export type ClaimStackParamList = {
   Main: undefined;
-  Sub: {buildingSelection: string};
+  Sub: {buildingSelection: Building};
   Detail: {
-    buildingSelection: string;
+    buildingSelection: Building;
     floorSelection: number;
   };
 };

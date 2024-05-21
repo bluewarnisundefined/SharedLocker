@@ -77,7 +77,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   );
 
   interface ICancelLockerMutation {
-    buildingName: string,
+    buildingNumber: number,
     floorNumber: number,
     lockerNumber: number,
     isOwner: boolean,
@@ -86,13 +86,13 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
   const cancelLockerMutation = 
     useMutation<ILockerCancel, IServerErrorResponse<string>, ICancelLockerMutation>({
     mutationFn: (data: {
-      buildingName: string,
+      buildingNumber: number,
       floorNumber: number,
       lockerNumber: number,
       isOwner: boolean,
     }) => {
       return lockerAPI().cancelLocker(
-        data.buildingName,
+        data.buildingNumber,
         data.floorNumber,
         data.lockerNumber,
         data.isOwner,
@@ -221,7 +221,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
           text: '확인',
           onPress: () => {
             cancelLockerMutation.mutate({
-              buildingName: selectedLocker.buildingName,
+              buildingNumber: selectedLocker.buildingNumber,
               floorNumber: selectedLocker.floorNumber,
               lockerNumber: selectedLocker.lockerNumber,
               isOwner: selectedLocker.owned,
