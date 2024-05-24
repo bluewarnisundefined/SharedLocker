@@ -38,7 +38,13 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async error => {
-    const { config, response: { status } } = error;
+    const config = error?.config;
+    const response = error?.response;
+    const status = response?.status;
+
+    if (!config || !response || !status) {
+      return Promise.reject(error);
+    }
 
     const ignore = ['/auth/token', '/auth/login', '/auth/register'];
 
