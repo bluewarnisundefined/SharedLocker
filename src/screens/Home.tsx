@@ -194,8 +194,6 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
       return;
     }
 
-    console.log('generateQRCode selectedLocker: ', selectedLocker);
-
     if (!qrKeyData || !qrKeyData.data.success || !qrKeyData.data.value) return;
 
     const lockerInfo = `${selectedLocker?.buildingNumber} ${selectedLocker?.floorNumber} ${selectedLocker?.lockerNumber}`;
@@ -355,7 +353,7 @@ export function HomeNavigator(): JSX.Element {
     isError: userIsError
   } = useQuery<IUser>(['user'], () => userAPI().user());
 
-  const isAdmin = Array.isArray(userData?.data?.message.admin) && userData?.data?.message.admin.length > 0;
+  const admin = userData?.data?.message.admin;
 
   return (
     <Tab.Navigator>
@@ -372,7 +370,7 @@ export function HomeNavigator(): JSX.Element {
         tabBarIcon: 'share-variant',
       }}/>
       {
-        isAdmin && (
+        admin && admin.role === 'worker' && (
           <Tab.Screen name="Admin" component={Admin} options={{
             tabBarLabel: '관리자',
             tabBarIcon: 'shield-account',
