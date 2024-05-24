@@ -7,17 +7,29 @@ export enum LockerStatus {
     UnAvailable = 'Unavailable',
     Maintenance = 'Maintenance',
 }
-
-export interface ILockerWithUserInfo {
-    buildingNumber: number
-    buildingName: string;
-    floorNumber: number;
-    lockerNumber: number;
-    claimedByUser: User;
-    sharedWithUsers: User[];
-    shareRequestedUsers: User[];
-    status: LockerStatus;
+export interface Locker {
+  buildingNumber: number
+  buildingName: string;
+  floorNumber: number;
+  lockerNumber: number;
+  claimedByUser: User;
+  sharedWithUsers: User[];
+  shareRequestedUsers: User[];
+  status: LockerStatus;
+}
+export interface ILockerWithUserInfo extends Locker {
     owned: boolean;
+}
+
+export interface ISimpleLockerInfo {
+  floorNumber: number;
+  lockerNumber: number;
+  status: string;
+}
+export interface AssignedLocker {
+  buildingNumber: number;
+  buildingName: string;
+  lockers: ISimpleLockerInfo[]
 }
 
 // 보관함 신청 관련 배열 타입
