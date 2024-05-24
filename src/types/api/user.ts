@@ -1,5 +1,5 @@
 import { IServerInfoResponse } from ".";
-import { ILockerWithUserInfo } from "./locker";
+import { AssignedLocker, ILockerWithUserInfo } from "./locker";
 
 export interface Admin {
     role: string
@@ -9,7 +9,8 @@ export interface User {
     nickname: string;
     email: string;
     createdAt: string;
-    admin?: Admin[];
+    admin?: Admin;
+    assignedLocker?: AssignedLocker[];
 }
 
 export interface IUser extends IServerInfoResponse<User> {}
