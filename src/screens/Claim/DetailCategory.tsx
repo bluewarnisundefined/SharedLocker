@@ -38,7 +38,7 @@ export default function DetailCategory({
       if (_data?.success) {
         Toast.show({
           type: 'success',
-          text2: `${buildingSelection} ${floorSelection}층 ${locker.lockerNumber}번 보관함을 신청하였습니다.`,
+          text2: `${buildingSelection.buildingName} ${floorSelection}층 ${locker.lockerNumber}번 보관함을 신청하였습니다.`,
         });
         navigation.navigate('Home', {refresh: true});
       }
