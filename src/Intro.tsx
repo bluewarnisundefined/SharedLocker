@@ -83,11 +83,6 @@ export default function Intro(): JSX.Element {
       const accessToken = tokenExist ? token!.accessToken : '';
       const refreshToken = tokenExist ? token!.refreshToken : '';
 
-      console.log(
-        '[App] useQuery refresh Token authData.data: ',
-        authData.data,
-      );
-
       if (success && !tokenExist) {
         setIsLoggedIn(false);
       }
