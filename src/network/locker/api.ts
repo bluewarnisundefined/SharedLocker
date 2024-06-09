@@ -56,13 +56,11 @@ const lockerAPI = () => ({
     lockerNumber: number,
     isOwner: boolean,
   ): Promise<ILockerCancel> => {
-    return axiosInstance.delete('/api/locker/cancel', {
-      data: {
-        buildingNumber,
-        floorNumber,
-        lockerNumber,
-        isOwner
-      },
+    return axiosInstance.post('/api/locker/cancel', {
+      buildingNumber,
+      floorNumber,
+      lockerNumber,
+      isOwner
     });
   }
 });

@@ -11,8 +11,7 @@ export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element 
     isError
   } = useQuery<IUser>(['user'], () => userAPI().user());
 
-  const admins = userData?.data?.message.admin;
-  const admin_role_available = Array.isArray(admins) && admins.length > 0;
+  const admins = userData?.data?.value.admin;
 
   return (
     <Layout>
@@ -21,13 +20,13 @@ export function Profile(props: SettingStackScreenProps<'Profile'>): JSX.Element 
         isError ?
           (<Text>회원 정보를 가져올 수 없습니다.</Text>) : (
             <>
-              <Text>아이디: {userData?.data?.message.userId}</Text>
-              <Text>이름: {userData?.data?.message.nickname}</Text>
-              <Text>이메일: {userData?.data?.message.email}</Text>
-              <Text>등록일: {userData?.data?.message.createdAt}</Text>
+              <Text>아이디: {userData?.data?.value.userId}</Text>
+              <Text>이름: {userData?.data?.value.nickname}</Text>
+              <Text>이메일: {userData?.data?.value.email}</Text>
+              <Text>등록일: {userData?.data?.value.createdAt}</Text>
               {
-                admin_role_available && (
-                  <Text>관리자 권한: {admins[0].role}</Text>
+                admins && (
+                  <Text>관리자 권한: {admins.role}</Text>
                 )
               }
             </>

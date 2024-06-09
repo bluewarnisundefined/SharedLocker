@@ -32,7 +32,7 @@ export default function Admin(): JSX.Element {
         ['qrKey'],
         () => authAPI().qrKey(),
         {
-            enabled: userData?.data.message?.assignedLocker?.length! > 0,
+            enabled: userData?.data.value?.assignedLocker?.length! > 0,
             refetchInterval: (data, query) => {
                 if (!data || !data.data.success || !data.data.value) return false;
 
@@ -48,7 +48,7 @@ export default function Admin(): JSX.Element {
     useEffect(() => {
         const res: any[] = [];
 
-        const assignedLockerList = userData?.data.message.assignedLocker;
+        const assignedLockerList = userData?.data.value.assignedLocker;
 
         if (!assignedLockerList) {
             return;
