@@ -64,15 +64,7 @@ export default function Home(props: HomeTabScreenProps<'Home'>): JSX.Element {
     () => authAPI().qrKey(),
     {
       enabled: userLocker.size > 0,
-      refetchInterval: (data, query) => {
-        if (!data || !data.data.success || !data.data.value) return false;
-
-        const value = data.data.value;
-        const currentTime = new Date().getTime();
-        const expiresIn = value.expiredAt - currentTime;
-
-        return expiresIn;
-      }
+      refetchInterval: 20000
     }
   );
 
@@ -353,7 +345,7 @@ export function HomeNavigator(): JSX.Element {
     isError: userIsError
   } = useQuery<IUser>(['user'], () => userAPI().user());
 
-  const admin = userData?.data?.message.admin;
+  const admin = userData?.data?.value.admin;
 
   return (
     <Tab.Navigator>
