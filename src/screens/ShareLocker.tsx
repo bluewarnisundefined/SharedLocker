@@ -60,7 +60,7 @@ export default function ShareLocker(
   const getSharedUserList = useCallback(() => {
     if(typeof selectedLocker === 'undefined') return null;
 
-    return selectedLocker.sharedWithUsers.map((user) => {
+    return selectedLocker.sharedWithUsers?.map((user) => {
       return (
         <View key={user.userId}>
           <Text>{`${user.nickname} (${user.userId})`}</Text>
