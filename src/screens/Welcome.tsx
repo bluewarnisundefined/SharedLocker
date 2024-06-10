@@ -1,10 +1,46 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Linking, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import {WelcomeStackScreenProps} from '@/navigation/types';
 import {removeAllSecureToken} from '@/utils/keychain';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+import { useQuery } from '@tanstack/react-query';
+import { IToken } from '@/types/api/auth';
+import authAPI from '@/network/auth/api';
 
-export default function Welcome(props: WelcomeStackScreenProps<'Welcome'>): JSX.Element {
+export default function Welcome(props: WelcomeStackScreenProps<'Welcome'>): JSX.Element {  
+  const authorizationCode = props.route.params?.code
+  const { 
+    status: tokenResolveStatus, data: tokenResolveData 
+  } = useQuery<IToken>(['auth'], () => authAPI().resolveAuthorizationCode(authorizationCode), {
+    enabled: authorizationCode !== undefined,
+  });
+  
+  const kakaoLoginBtn = async () => {
+    const url = `${process.env.API_BASE_URL}/auth/callback/native/kakao`
+    try {
+      if (await InAppBrowser.isAvailable()) {
+        InAppBrowser.openAuth(url, 'sharedlocker://', {
+          // iOS Properties
+          ephemeralWebSession: false,
+          // Android Properties
+          showTitle: false,
+          enableUrlBarHiding: true,
+          enableDefaultShare: false
+        }).then((response) => {
+          if (
+            response.type === 'success' &&
+            response.url
+          ) {
+            Linking.openURL(response.url)
+          }
+        })
+      } else Linking.openURL(url)
+    } catch (error) {
+      Linking.openURL(url)
+    }
+  }
+  
   return (
     <View
       style={{
@@ -26,6 +62,9 @@ export default function Welcome(props: WelcomeStackScreenProps<'Welcome'>): JSX.
         style={{
           gap: 8,
         }}>
+          <Button mode="contained-tonal" onPress={kakaoLoginBtn}>
+            카카오 로그인
+          </Button>
         <Button
           mode="contained-tonal"
           onPress={() => {

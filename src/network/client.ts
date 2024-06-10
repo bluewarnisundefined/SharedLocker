@@ -13,7 +13,13 @@ export const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
    async config => {
-    if(config.url === '/auth/login' || config.url === '/auth/register') {
+    const ignore = [
+      '/auth/resolve-token', 
+      '/auth/login', 
+      '/auth/register'
+    ];
+    
+    if (ignore.includes(config.url!)) {
       return config;
     }
     // Get token from storage

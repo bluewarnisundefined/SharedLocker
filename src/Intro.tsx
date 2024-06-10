@@ -16,6 +16,7 @@ import SplashScreen from 'react-native-splash-screen';
 import Toast from 'react-native-toast-message';
 import userAPI from './network/user/api';
 import { IUser } from './types/api/user';
+import { Text } from 'react-native-paper';
 
 interface ILockerScreenContext {
   selectedLocker: ILockerWithUserInfo | undefined,
@@ -101,11 +102,21 @@ export default function Intro(): JSX.Element {
     }
     SplashScreen.hide();
   }, [isLoggedIn, rfToken]);
-
   
+  const linking = {
+    prefixes: [
+      'sharedlocker://',
+    ],
+    config: {
+      screens: {
+        Welcome: '/welcome',
+      }
+    }
+  };
+
   return (
     <LockerContext.Provider value={{ selectedLocker, setSelectedLocker }}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
         {
           isLoggedIn ? (
             <HomeStack.Navigator initialRouteName='HomeNavigator' >

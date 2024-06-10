@@ -25,6 +25,8 @@ export interface ILogin extends IServerInfoResponse<string, TokenResponse> {}
 export interface ILogout extends IServerInfoResponse<string> {}
 // POST /auth/token/
 export interface IToken extends IServerInfoResponse<string, TokenResponse> {}
+// POST /auth/resolve-token/
+export interface IResolveToken extends IServerInfoResponse<string, TokenResponse> {}
 // GET /auth/qrkey/
 export interface IQrKey extends IServerInfoResponse<string, QRKey> {}
 // POST /auth/qrkey/

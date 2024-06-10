@@ -33,6 +33,11 @@ const authAPI = () => ({
       refresh_token: token,
     });
   },
+  resolveAuthorizationCode: async (code: string): Promise<IToken> => {
+    return axiosInstance.post('/auth/resolve-token', {
+      code,
+    });
+  },
   qrKey: async (): Promise<IQrKey> => {
     return axiosInstance.get('/auth/qrkey');
   }
