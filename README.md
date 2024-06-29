@@ -1,5 +1,10 @@
 # 스마트 공유 보관함 (Shared Locker)
 
+프로젝트 참여자
+
+20213846 주재현
+
+
 이 프로젝트는 공유 보관함 서비스의 프론트 엔드를 담당합니다.
 
 서버 프로젝트는 [여기](https://github.com/deepbluewarn/sharedlocker-server)에서 볼 수 있습니다.
